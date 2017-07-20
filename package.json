@@ -1,0 +1,48 @@
+{
+  "name": "@meitu/canvas",
+  "version": "1.0.0",
+  "description": "meitu library template.",
+  "main": "dist/MCanvas.js",
+  "module": "dist/MCanvas.es.js",
+  "moduleName": "MCanvas",
+  "scripts": {
+    "test": "mocha test/index.js",
+    "start": "cd example && http-server",
+    "watch": "NODE_ENV=example rollup -w -c rollup.config.js",
+    "dev": "NODE_ENV=development rollup -c rollup.config.js",
+    "prod": "NODE_ENV=production rollup -c rollup.config.js",
+    "publish": "rm -rf dist && npm run dev && npm run prod",
+    "lint": "eslint src"
+  },
+  "repository": {
+    "url": "https://gitlab.meitu.com/npm/lib-example.git",
+    "type": "git"
+  },
+  "author": "gxd <lbc@meitu.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-eslint": "^7.2.2",
+    "babel-plugin-syntax-flow": "^6.18.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "es6-promise": "^4.1.1",
+    "eslint": "^3.19.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^3.2.0",
+    "rollup-plugin-async": "^1.2.0",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-inject": "^2.0.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-uglify": "^1.0.1",
+    "rollup-watch": "^3.2.2"
+  },
+  "dependencies": {
+    "@meitu/gesture": "^1.1.3",
+    "Promise": "^1.0.5",
+    "es6-promise": "^4.1.1"
+  }
+}

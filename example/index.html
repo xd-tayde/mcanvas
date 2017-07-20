@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>mtCanvas</title>
+    <link rel="stylesheet" href="./main.css">
+    <script>
+        (function(m, n) {
+            var o = navigator.userAgent,
+                p = /android|adr/gi.test(o),
+                j = /iphone|ipod|ipad/gi.test(o) && !p;
+            var k = n.documentElement;
+            var l = function() {
+                    var a = k.getBoundingClientRect().width || 320;
+                    var b = a / 320 * 20;
+                    b = b > 40 ? 40 : b;
+                    k.style.fontSize = b + "px";
+                    window.fontSize = b
+                },
+                i;
+            m.addEventListener("resize", function() {
+                clearTimeout(i);
+                i = setTimeout(l, 100)
+            }, false);
+            m.addEventListener("pageshow", function(a) {
+                if (a.persisted) {
+                    clearTimeout(i);
+                    i = setTimeout(l, 100)
+                }
+            }, false);
+            l()
+        })(window, document);
+    </script>
+</head>
+<body>
+    <h1 class="title">MCanvas.js</h1>
+    <img style="width:300px" src="http://mtapplet.meitudata.com/596c72073971d86b5128.jpg" alt="">
+    <img style="width:300px" src="" alt="" class="js-result">
+    <script src="./zepto.min.js"></script>
+    <script src="./dist/example.js"></script>
+</body>
+</html>
