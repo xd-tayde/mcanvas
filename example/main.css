@@ -2,7 +2,7 @@
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, legend, input, button, textarea, p, blockquote, th, td ,header, section, aside, nav, menu, hgroup, audio, video, figure, figcaption, footer, article{ margin:0; padding:0; }
 table { border-collapse:collapse; border-spacing:0; }
 em { font-style:normal; }
-fieldset, img { border:0; }
+fieldset, img { border:0; vertical-align: middle;}
 li { list-style:none; }
 caption, th { text-align:left; }
 h1, h2, h3, h4, h5, h6 { font-size:100%;}
@@ -48,21 +48,51 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(255,0,0,0);}
 }
 html,body{
     width: 100%;
-    height: 100%;
+    /*height: 100%;*/
     overflow-x: hidden;
+    text-align: center;
 }
 
-.btn{
-    width: 150px;
-    height: 50px;
-    background: #996699;
+.top{
     display: inline-block;
-    color: white;
-    line-height: 50px;
-    text-align: center;
-    border-radius: 25px;
-    margin: 20px 0;
+    border: 2px solid #FF9999;
+    width: 70%;
+    padding: 5px;
+    box-sizing: border-box;
 }
+
+.origin{
+    width: 100%;
+}
+.result{
+    width:100%;
+}
+
+.addBtn{
+    display: inline-block;
+    width: 90%;
+    margin: 15px 0;
+}
+
+.Button{
+    text-align: center;
+    display: inline-block;
+    width: 90px;
+    height: 35px;
+    background: #996699;
+    color: white;
+    font-size: 14px;
+    line-height: 35px;
+    border-radius: 20px;
+    margin: 0 3px;
+}
+
+.Button.clear{
+    margin-top: 20px;
+    width: 150px;
+    border-radius: 50px;
+}
+
 .Button.taped{
     background: #CC99CC;
 }
@@ -71,10 +101,71 @@ html,body{
     color: #996699;
     font-size: 40px;
     line-height: 60px;
+    margin-bottom: 10px;
 }
-.sub-title{
-    font-size: 24px;
-    line-height: 48px;
-    color: #FF9999;
+
+.dialog{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    text-align: left;
+    display: none;
+}
+.dialog h3{
+    color:#996699;
+    text-align: left;
+}
+.dialog>.window{
+    display: inline-block;
+    position: absolute;
+    padding: 20px 30px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    background: white;
+    max-width: 90%;
     text-align: center;
+    width: 70%;
+}
+.window>.Button{
+    width: 45%;
+    min-width: 40px;
+}
+.params{
+    text-align: left;
+    margin: 20px 0;
+}
+.params>li{
+    position: relative;
+    white-space: nowrap;
+}
+.params .input{
+    position: absolute;
+    border: 2px solid #eee;
+    top: 5px;
+    right: 60px;
+    width: 100px;
+    height: 70%;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+.params .select{
+    position: absolute;
+    top: 5px;
+    right: 60px;
+    width: 100px;
+    height: 70%;
+    border-radius: 0;
+    padding-left: 5px;
+    box-sizing: border-box;
+    background: white;
+    border: 2px solid #eee;
+}
+
+.params .input.focus{
+    border: 2px solid #FF9999;
 }

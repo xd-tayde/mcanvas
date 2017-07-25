@@ -1,7 +1,7 @@
 {
   "name": "@meitu/canvas",
   "version": "1.0.0",
-  "description": "meitu library template.",
+  "description": "图片合成组件",
   "main": "dist/MCanvas.js",
   "module": "dist/MCanvas.es.js",
   "moduleName": "MCanvas",
@@ -15,7 +15,7 @@
     "lint": "eslint src"
   },
   "repository": {
-    "url": "https://gitlab.meitu.com/npm/lib-example.git",
+    "url": "https://gitlab.meitu.com/npm/meitu-mcanvas.git",
     "type": "git"
   },
   "author": "gxd <lbc@meitu.com>",

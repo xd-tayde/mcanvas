@@ -44,4 +44,11 @@ export default {
             return;
         }
     },
+    forin(obj,cbk){
+        for(let k in obj){
+            if(obj.hasOwnProperty(k)){
+                cbk(k,obj[k]);
+            }
+        }
+    },
 };

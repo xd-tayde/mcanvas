@@ -36,8 +36,26 @@
 </head>
 <body>
     <h1 class="title">MCanvas.js</h1>
-    <img style="width:300px" src="http://mtapplet.meitudata.com/596c72073971d86b5128.jpg" alt="">
-    <img style="width:300px" src="" alt="" class="js-result">
+    <div class="top">
+        <img class="origin js-result" src="http://mtapplet.meitudata.com/596c72073971d86b5128.jpg" alt="">
+    </div>
+    <div class="addBtn">
+        <span class="Button js-addImage">添加图片</span>
+        <span class="Button js-addWm">添加水印</span>
+        <span class="Button js-addText">添加文字</span>
+        <span class="Button clear js-clear">重置</span>
+    </div>
+    <!-- <div class="bottom">
+        <img class="result js-result" src="" alt="" >
+    </div> -->
+    <div class="dialog js-dialog">
+        <div class="window">
+            <h3>参数:</h3>
+            <ul class="params js-params"></ul>
+            <span class="Button js-cancel">取消</span>
+            <span class="Button js-sure">确定</span>
+        </div>
+    </div>
     <script src="./zepto.min.js"></script>
     <script src="./dist/example.js"></script>
 </body>
