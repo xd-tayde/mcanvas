@@ -1,6 +1,6 @@
 {
   "name": "@meitu/canvas",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "图片合成组件",
   "main": "dist/MCanvas.js",
   "module": "dist/MCanvas.es.js",

@@ -32,7 +32,7 @@ let data = {
         options:{
             width:'200',
             align:'left',
-
+            largeStyle:{
                 color:'red',
             },
             normalStyle:{

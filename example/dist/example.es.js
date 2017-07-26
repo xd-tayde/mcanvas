@@ -452,7 +452,7 @@ var MCanvas = function () {
                         color: '#000',
                         lineheight: size * 1.1
                     },
-                    bigStyle: {
+                    largeStyle: {
                         font: size * 1.3 + 'px ' + fontFamily,
                         color: '#000',
                         lineheight: size * 1.4
@@ -482,7 +482,7 @@ var MCanvas = function () {
                 var value = arr[i];
                 if (/<\/s>|<\/b>/.test(value)) {
                     var splitTag = /<\/s>/.test(value) ? '</s>' : '</b>',
-                        type = /<\/s>/.test(value) ? 'small' : 'big';
+                        type = /<\/s>/.test(value) ? 'small' : 'large';
                     var tmp = arr[i].split(splitTag);
                     result.push({
                         type: type,
@@ -719,7 +719,7 @@ var data = {
         options: {
             width: '200',
             align: 'left',
-            bigStyle: {
+            largeStyle: {
                 color: 'red'
             },
             normalStyle: {

@@ -317,7 +317,7 @@ export default class MCanvas {
                     color:'#000',
                     lineheight:size*1.1,
                 },
-                bigStyle:{
+                largeStyle:{
                     font : `${size * 1.3}px ${fontFamily}`,
                     color:'#000',
                     lineheight:size * 1.4,
@@ -344,7 +344,7 @@ export default class MCanvas {
             let value = arr[i];
             if(/<\/s>|<\/b>/.test(value)){
                 let splitTag = /<\/s>/.test(value) ? '</s>' : '</b>',
-                    type     = /<\/s>/.test(value) ? 'small' : 'big';
+                    type     = /<\/s>/.test(value) ? 'small' : 'large';
                 let tmp = arr[i].split(splitTag);
                 result.push({
                     type:type,
