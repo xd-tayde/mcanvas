@@ -2,7 +2,6 @@ import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import resolve from 'rollup-plugin-node-resolve';
-import async from 'rollup-plugin-async';
 
 const packages = require('./package.json');
 
@@ -38,7 +37,7 @@ switch (process.env.NODE_ENV) {
 Configure = {
     entry: `${paths.source.root}index.js`,
     moduleName: packages.moduleName,
-    moduleId: packages.moduleName,
+    // moduleId: packages.moduleName,
     sourceMap: true,
     targets: [
         {
@@ -47,13 +46,12 @@ Configure = {
         },
     ],
     globals: {
-        Promise: ['es6-promise', 'Promise'],
+
     },
     plugins: [
         babel(),
         sourcemaps(),
         resolve(),
-        async(),
     ],
 };
 
