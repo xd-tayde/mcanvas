@@ -1,9 +1,7 @@
 # 图片合成插件 MCanvas.js
 
  [Example](http://f2er.meitu.com/gxd/mcanvas/example/index.html)   
-
  [Git](https://gitlab.meitu.com/npm/meitu-mcanvas)
-
  [Download](http://f2er.meitu.com/gxd/mcanvas/dist/canvas.min.js)
 
 ## Introduction：
