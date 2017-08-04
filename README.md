@@ -89,7 +89,7 @@ mc.background({
 
 ### 创建实例：
 
-#### `new MCanvas(width,height)` || MCanvas(width,height):
+#### `new MCanvas(width,height)` || `MCanvas(width,height)`:
 
 创建画布，初始化 `Canvas` ;
 
