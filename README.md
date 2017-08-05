@@ -2,7 +2,6 @@
 
  [Example](http://f2er.meitu.com/gxd/mcanvas/example/index.html)   
  [Git](https://gitlab.meitu.com/npm/meitu-mcanvas)
- [Download](http://f2er.meitu.com/gxd/mcanvas/dist/canvas.min.js)
 
 ## Introduction：
 
@@ -38,9 +37,11 @@
 ```js
 
 // 创建画布，初始化 canvas；
+// create the canvas by width and height;
 let mc = new MC(width,height);
 
-// backgournd : 准备底图；提供多种模式
+// background : 准备底图；提供多种模式
+// prepare background-image
 mc.background({
     image:'',
     left:0,
@@ -50,6 +51,7 @@ mc.background({
 })
 
 // add 添加图片素材基础函数；
+// prepare the image material, add into queue;
 .add('images/nose.png',{
     width:183,
     pos:{
@@ -61,6 +63,7 @@ mc.background({
 })
 
 // text 添加文字数据基础函数；
+// add text;
 .text('郭晓东<br><s>啊啊啊</s>',{
     width:'300px',
     align:'center',
@@ -71,12 +74,14 @@ mc.background({
 })
 
 // watermark 添加水印函数，基于 add 函数封装；
+// prepare watermark;
 .watermark(img ,{
     width:'40%',
     pos:'rightBottom',
 })
 
 // draw 最终绘制函数，用于最终的绘制；
+// draw all material that prepared before, and get the base64-image
 .draw( b64 =>{
 	 console.log(b64);
 });
@@ -90,6 +95,7 @@ mc.background({
 #### `new MCanvas(width,height)` || `MCanvas(width,height)`:
 
 创建画布，初始化 `Canvas` ;
+create the canvas by width and height;
 
 params:
 
@@ -104,10 +110,13 @@ params:
 #### 1、 `mc.background(bg)`:
 
 绘制画布的底图；
+prepare background-image；
 
 bg: optional ，如果不填，则使用 默认参数；
 
 > 每次绘制背景后，都会将参数储存为 默认值，因此可以通过不传值调用该函数来恢复背景图初始化；
+> 
+> can init background-image without params if you `mc.background(bg)` before;
 
 params:
 
@@ -146,17 +155,19 @@ image : '',
 // 配置参数：
 options : {
 	// 素材的宽度值，相对于画布；
-	// 支持3种值  width: 100 / '100%' / '100px';
+	// example: width: 100 / '100%' / '100px';
     width:'100%',
 
     // 裁剪系数，相对于素材图；
+    // crop params;
     crop:{
     	 // 相对于素材图的坐标点，原点为左上点；
         x:0,
         y:0,
 
-        // 需要裁剪的宽高，同样支持 100/'100%'/'100px' 3种值；
+        // 需要裁剪的宽高, example:100/'100%'/'100px'；
         // 内部有做最大值的判断；
+        
         width:'100%',
         height:'100%',
     },
@@ -164,7 +175,7 @@ options : {
     // 位置系数，相对于画布；
     pos:{
     	 // 相对于画布的坐标点，原点为左上点;
-    	 // 支持多种值：
+    	 // example：
     	 // x: 250 / '250px' / '100%' / 'left:250' / 'center',
         x:0,
         y:0,
@@ -181,6 +192,7 @@ options : {
 #### 3、`watermark(image,options)`:
 
 添加水印函数，基于 `add()` 封装，使用更便携方便；
+prepare the watermark;
 
 params:
 
@@ -212,7 +224,8 @@ options:{
 
 #### 4、`text(context,options)`:
 
-添加文字函数；
+添加文字函数；支持多样式，自动换行；
+prepare the text;and you can use `<b>/<s>/<br>`;
 
 params:
 
@@ -225,7 +238,7 @@ context : '<b>大字大字大字</b>常规字体<br>换行<s>小字小字小字<
 
 options:{
 	 // 定义文字每行的宽度值，相对于画布；
-	 // 支持3种值  width: 100 / '100%' / '100px';
+	 // example :  width: 100 / '100%' / '100px';
     width : 300,
 
     // 每一行文字的 align 值
@@ -241,6 +254,7 @@ options:{
 
     // 可通过以下参数进行配置；
     // 小字的样式
+    // the style of contained in <s></s>
     smallStyle:{
         font : ``,
         color:'#000',
@@ -248,6 +262,7 @@ options:{
     },
 
     // 常规字体的样式
+    // the style of normal font
     normalStyle:{
         font : ``,
         color:'#000',
@@ -255,6 +270,7 @@ options:{
     },
 
     // 大字样式；
+    // the style of contained in <b></b>
     largeStyle:{
         font : '',
         color:'#000',
@@ -262,6 +278,7 @@ options:{
     },
 
     // 位置系数，相对于画布；
+    // the position of text on canvas;
     pos:{
     	 // 相对于画布的坐标点，原点为左上点;
     	 // 支持多种值：
@@ -275,11 +292,15 @@ options:{
 
 绘制函数，`add`/`watermark`/`text` 方法都需要在末尾调用该方法进行绘制,且该函数包含导出功能，回调中可直接得到结果图的 `base64` ;
 
+draw the image and get the base64;
+
 params:
 
 ```js
 // 由于异步的缘故，因此只有在该回调中，才能取到 base64 和 各项配置系数；
-fn: (base64)=>{};
+mc.draw(b64 =>{
+
+})
 ```
 
 
