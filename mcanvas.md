@@ -1,4 +1,4 @@
-# 图片快速合成插件--mcanvas.js
+# 极简图片合成/裁剪插件--mcanvas.js
 
 ### [demo](http://f2er.meitu.com/gxd/mcanvas/example/index.html) [详细文档](./README.md)
 
