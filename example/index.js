@@ -49,7 +49,7 @@ let data = {
     },
 };
 
-let mc = MCanvas(1000);
+let mc = MCanvas(1000,1000,'black');
 mc.background({
     image:'http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',
     left:0,

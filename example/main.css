@@ -57,6 +57,7 @@ html,body{
     display: inline-block;
     border: 2px solid #FF9999;
     width: 70%;
+    max-width: 400px;
     padding: 5px;
     box-sizing: border-box;
 }
@@ -126,7 +127,7 @@ html,body{
     top: 50%;
     transform: translate(-50%,-50%);
     background: white;
-    max-width: 90%;
+    max-width: 400px;
     text-align: center;
     width: 70%;
 }

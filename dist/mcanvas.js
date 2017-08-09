@@ -61,17 +61,18 @@ var _ = {
     }
 };
 
-function MCanvas(cwidth, cheight) {
+function MCanvas(cwidth, cheight, background) {
 
     // 兼容不使用 new 的方式；
-    if (!(this instanceof MCanvas)) return new MCanvas(cwidth, cheight);
+    if (!(this instanceof MCanvas)) return new MCanvas(cwidth, cheight, background);
 
     // 配置canvas初始大小；
     // cwidth：画布宽度，Number,选填，默认为 500;
     // cheight: 画布高度，Number，选填，默认与宽度一致；
     this.ops = {
         width: cwidth || 500,
-        height: cheight || cwidth
+        height: cheight || cwidth,
+        background: background
     };
     // 全局画布；
     this.canvas = null;
@@ -97,6 +98,10 @@ MCanvas.prototype._init = function () {
     this.canvas.width = this.ops.width;
     this.canvas.height = this.ops.height;
     this.ctx = this.canvas.getContext('2d');
+    if (this.ops.background) {
+        this.ctx.fillStyle = this.ops.background;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 };
 
 // --------------------------------------------------------

@@ -1,7 +1,8 @@
 {
-	"name": "@meitu/mcanvas",
-	"version": "1.1.3",
+	"name": "mcanvas",
+	"version": "1.1.4",
 	"description": "the image-composer or image-croper that can draw image/text/watermark or crop the image, and it provides the simple api to do more things conveniently.",
+	"keywords":["canvas","image-composite","image-textview","watermark","image-crop"],
 	"main": "dist/mcanvas.js",
 	"module": "dist/mcanvas.es.js",
 	"moduleName": "MCanvas",
@@ -15,7 +16,7 @@
 		"lint": "eslint src"
 	},
 	"repository": {
-		"url": "https://gitlab.meitu.com/npm/meitu-mcanvas.git",
+		"url": "https://github.com/xd-tayde/mcanvas",
 		"type": "git"
 	},
 	"author": "gxd <lbc@meitu.com>",
