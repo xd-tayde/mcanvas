@@ -68,8 +68,10 @@ MCanvas.prototype.background = function(bg){
 };
 
 MCanvas.prototype._background = function(img,bg){
+    
+    let {iw,ih} = this._getSize(img);
     // 图片与canvas的长宽比；
-    let iRatio = img.naturalWidth / img.naturalHeight;
+    let iRatio = iw / ih;
     let cRatio = this.canvas.width / this.canvas.height;
     // 背景绘制参数；
     let sx,sy,swidth,sheight,dx,dy,dwidth,dheight;
@@ -79,10 +81,10 @@ MCanvas.prototype._background = function(img,bg){
             sx = bg.left || 0;
             sy = bg.top || 0;
             if(iRatio > cRatio){
-                swidth = img.naturalHeight * cRatio;
-                sheight = img.naturalHeight;
+                swidth = ih * cRatio;
+                sheight = ih;
             }else{
-                swidth = img.naturalWidth;
+                swidth = iw;
                 sheight = swidth / cRatio;
             }
             dy = dx = 0;
@@ -92,8 +94,8 @@ MCanvas.prototype._background = function(img,bg){
         // 包含模式，固定canvas大小，包含背景图；
         case 'contain':
             sy = sx = 0;
-            swidth = img.naturalWidth;
-            sheight = img.naturalHeight;
+            swidth = iw;
+            sheight = ih;
             if(iRatio > cRatio){
                 dwidth = this.canvas.width;
                 dheight = dwidth / iRatio;
@@ -109,11 +111,11 @@ MCanvas.prototype._background = function(img,bg){
         // 原图模式：canvas与原图大小一致，忽略初始化 传入的宽高参数；
         // 同时，background 传入的 left/top 均被忽略；
         case 'origin':
-            this.canvas.width = img.naturalWidth;
-            this.canvas.height = img.naturalHeight;
+            this.canvas.width = iw;
+            this.canvas.height = ih;
             sx = sy = 0;
-            swidth = img.naturalWidth;
-            sheight = img.naturalHeight;
+            swidth = iw;
+            sheight = ih;
             dx = dy = 0;
             dwidth = this.canvas.width;
             dheight = this.canvas.height;
@@ -206,7 +208,8 @@ MCanvas.prototype.add = function(image = '',options){
 };
 
 MCanvas.prototype._add = function(img,ops){
-    let ratio = img.naturalWidth / img.naturalHeight;
+    let {iw,ih} = this._getSize(img);
+    let ratio = iw / ih;
     // 画布canvas参数；
     let cdx,cdy,cdw,cdh;
     // 素材canvas参数；
@@ -220,17 +223,18 @@ MCanvas.prototype._add = function(img,ops){
     let lctxScale = ratio * 1.4 > 5 ? 5 : ratio * 1.4;
     let spaceX,spaceY;
 
-    lcvs.width =  img.naturalWidth * lctxScale;
-    lcvs.height = img.naturalHeight * lctxScale;
+    lcvs.width =  iw * lctxScale;
+    lcvs.height = ih * lctxScale;
 
     // 从素材canvas的中心点开始绘制；
-    ldx = -img.naturalWidth/2;
-    ldy = -img.naturalHeight/2;
-    ldw = img.naturalWidth;
-    ldh = img.naturalHeight;
+    ldx = -iw / 2;
+    ldy = -ih / 2;
+    ldw = iw;
+    ldh = ih;
 
     lctx.translate(lcvs.width/2,lcvs.height/2);
     lctx.rotate(ops.pos.rotate);
+
     lctx.drawImage(img,lsx,lsy,lsw,lsh,ldx,ldy,ldw,ldh);
     //
     // lcvs.style = 'width:300px';
@@ -238,7 +242,7 @@ MCanvas.prototype._add = function(img,ops){
 
     // 获取素材最终的宽高;
     cdw = ops.width * lctxScale;
-    cdh = cdw/ ratio;
+    cdh = cdw / ratio;
 
     spaceX = (lctxScale - 1) * ops.width / 2;
     spaceY = spaceX / ratio;
@@ -256,12 +260,28 @@ MCanvas.prototype._add = function(img,ops){
     lcvs = lctx = null;
     this._next();
 };
+
+// 获取宽高，兼容img，canvas
+MCanvas.prototype._getSize = function(img){
+    let iw,
+        ih;
+    if(img.tagName === 'IMG'){
+        iw = img.naturalWidth;
+        ih = img.naturalHeight;
+    }else if(img.tagName === 'CANVAS'){
+        iw = img.width;
+        ih = img.height;
+    }else{
+        iw = img.offsetWidth;
+        ih = img.offsetHeight;
+    }
+    return{iw,ih};
+};
 // 参数加工函数；
 MCanvas.prototype._handleOps = function(ops,img){
     let cw = this.canvas.width,
-        ch = this.canvas.height,
-        iw = img.naturalWidth,
-        ih = img.naturalHeight;
+        ch = this.canvas.height;
+    let {iw,ih} = this._getSize(img);
 
     // 图片宽高比；
     let ratio = iw / ih;
@@ -283,8 +303,8 @@ MCanvas.prototype._handleOps = function(ops,img){
     // 最大值判定；
     if(crop.x > iw)crop.x = iw;
     if(crop.y > ih)crop.y = ih;
-    maxLsw = img.naturalWidth - crop.x;
-    maxLsh = img.naturalHeight - crop.y;
+    maxLsw = iw - crop.x;
+    maxLsh = ih - crop.y;
     if(crop.width > maxLsw)crop.width = maxLsw;
     if(crop.height > maxLsh)crop.height = maxLsh;
 
