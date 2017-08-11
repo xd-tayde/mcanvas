@@ -68,7 +68,7 @@ MCanvas.prototype.background = function(bg){
 };
 
 MCanvas.prototype._background = function(img,bg){
-    
+
     let {iw,ih} = this._getSize(img);
     // 图片与canvas的长宽比；
     let iRatio = iw / ih;
@@ -220,9 +220,12 @@ MCanvas.prototype._add = function(img,ops){
     let lctx = lcvs.getContext('2d');
     // 图片宽高比 * 1.4 是一个最安全的宽度，旋转任意角度都不会被裁剪；
     // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此甚至了最高倍数为5；
-    let lctxScale = ratio * 1.4 > 5 ? 5 : ratio * 1.4;
+    // _ratio 为 较大边 / 较小编 的比例；
+    let _ratio = iw > ih ? iw / ih : ih / iw;
+    let lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4;
     let spaceX,spaceY;
 
+    console.log(lctxScale);
     lcvs.width =  iw * lctxScale;
     lcvs.height = ih * lctxScale;
 
@@ -234,7 +237,6 @@ MCanvas.prototype._add = function(img,ops){
 
     lctx.translate(lcvs.width/2,lcvs.height/2);
     lctx.rotate(ops.pos.rotate);
-
     lctx.drawImage(img,lsx,lsy,lsw,lsh,ldx,ldy,ldw,ldh);
     //
     // lcvs.style = 'width:300px';
