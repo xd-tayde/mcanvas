@@ -56,7 +56,7 @@ mc.background({
     top:0,
     color:'#000000',
     type:'origin',
-}).draw();
+});
 
 let timer;
 $('.Button').on('touchstart',function(){

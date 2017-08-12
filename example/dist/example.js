@@ -111,8 +111,16 @@ MCanvas.prototype._init = function () {
 MCanvas.prototype.background = function (bg) {
     var _this = this;
 
-    if (!bg && this.bgConfig) bg = this.bgConfig;
-    this.bgConfig = bg;
+    if (!bg) {
+        if (this.bgConfig) {
+            bg = this.bgConfig;
+        } else {
+            console.error('mcanvas error : the init background must has the bg option params.');
+            return;
+        }
+    } else {
+        this.bgConfig = bg;
+    }
     this.queue.push(function () {
         if (bg.color) {
             _this.ctx.fillStyle = bg.color;
@@ -123,7 +131,7 @@ MCanvas.prototype.background = function (bg) {
                 _this._background(img, bg);
             });
         } else {
-            console.error('background image error!');
+            console.error('mcanvas error : background image error!');
         }
     });
     return this;
@@ -193,7 +201,7 @@ MCanvas.prototype._background = function (img, bg) {
             dheight = this.canvas.height;
             break;
         default:
-            console.error('background type error!');
+            console.error('mcanvas error:background type error!');
     }
     this.ctx.drawImage(img, sx, sy, swidth, sheight, dx, dy, dwidth, dheight);
     this._next();
@@ -208,7 +216,7 @@ MCanvas.prototype.watermark = function () {
     var ops = arguments[1];
 
     if (!image) {
-        console.log('there is not image of watermark');
+        console.error('mcanvas error : there is not image of watermark.');
         return;
     }
     // 参数默认值；
@@ -326,7 +334,6 @@ MCanvas.prototype._add = function (img, ops) {
     var spaceX = void 0,
         spaceY = void 0;
 
-    console.log(lctxScale);
     lcvs.width = iw * lctxScale;
     lcvs.height = ih * lctxScale;
 
@@ -738,7 +745,7 @@ mc.background({
     top: 0,
     color: '#000000',
     type: 'origin'
-}).draw();
+});
 
 var timer = void 0;
 $('.Button').on('touchstart', function () {

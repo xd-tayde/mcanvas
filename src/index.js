@@ -49,8 +49,16 @@ MCanvas.prototype._init = function(){
 // --------------------------------------------------------
 
 MCanvas.prototype.background = function(bg){
-    if(!bg && this.bgConfig)bg = this.bgConfig;
-    this.bgConfig = bg;
+    if(!bg){
+        if(this.bgConfig){
+            bg = this.bgConfig;
+        }else{
+            console.error('mcanvas error : the init background must has the bg option params.');
+            return;
+        }
+    }else{
+        this.bgConfig = bg;
+    }
     this.queue.push(() => {
         if(bg.color){
             this.ctx.fillStyle = bg.color;
@@ -61,7 +69,7 @@ MCanvas.prototype.background = function(bg){
                 this._background(img,bg);
             });
         }else{
-            console.error('background image error!');
+            console.error('mcanvas error : background image error!');
         }
     });
     return this;
@@ -121,7 +129,7 @@ MCanvas.prototype._background = function(img,bg){
             dheight = this.canvas.height;
             break;
         default:
-            console.error('background type error!');
+            console.error('mcanvas error:background type error!');
     }
     this.ctx.drawImage(img,sx,sy,swidth,sheight,dx,dy,dwidth,dheight);
     this._next();
@@ -133,7 +141,7 @@ MCanvas.prototype._background = function(img,bg){
 // 绘制水印；基于 add 函数封装；
 MCanvas.prototype.watermark = function(image = '',ops){
     if(!image){
-        console.log('there is not image of watermark');
+        console.error('mcanvas error : there is not image of watermark.');
         return;
     }
     // 参数默认值；
@@ -225,7 +233,6 @@ MCanvas.prototype._add = function(img,ops){
     let lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4;
     let spaceX,spaceY;
 
-    console.log(lctxScale);
     lcvs.width =  iw * lctxScale;
     lcvs.height = ih * lctxScale;
 

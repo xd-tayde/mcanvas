@@ -45,7 +45,7 @@ mc.background({
 })
 
 // add text;
-.text('郭晓东<br><s>啊啊啊</s>',{
+.text('normal<br><s>smallsmall</s>',{
     width:'300px',
     align:'center',
     pos:{
@@ -92,9 +92,10 @@ params:
 
 prepare background-image；
 
-bg: optional ，如果不填，则使用 默认参数；
+bg: optional ，default: init-bg；
 
-> can init background-image without params if you `mc.background(bg)` before, it can reset to the init background;
+> if you use `mc.background(bg)` before , then you can use `mc.background()` to reset to the init background. otherwise,
+> init background-image without params if you use `mc.background(bg)` before, it can reset to the init background;
 
 params:
 
