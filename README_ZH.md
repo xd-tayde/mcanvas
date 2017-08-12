@@ -1,4 +1,4 @@
-# 图片合成插件 MCanvas.js
+# MCanvas.js
 
  [Example](http://www.guoxiaodong.net/mcanvas/example/index.html)   
 
