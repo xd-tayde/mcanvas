@@ -15,7 +15,7 @@ Mcanvas is a plugin that can easily compose the image, text, watermark and expor
 - Or you can install via npm:
 
 ```js
-npm install chart.js --save
+npm install mcanvas --save
 ```
 
 ## Basic Usage
@@ -51,7 +51,7 @@ mc.background({
     pos:{
         x:0,
         y:0,
-	  },
+    },
 })
 
 // prepare watermark;
@@ -62,7 +62,7 @@ mc.background({
 
 // draw all material that prepared before, and get the base64-image
 .draw( b64 =>{
-	 console.log(b64);
+    console.log(b64);
 });
 ```
 
