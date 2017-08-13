@@ -1,8 +1,4 @@
-# MCanvas.js
-
- [Example](http://www.guoxiaodong.net/mcanvas/example/index.html)   
-
- [Git](https://github.com/xd-tayde/mcanvas)
+# 文档
 
 ## 简介：
 
