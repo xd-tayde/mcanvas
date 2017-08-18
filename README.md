@@ -11,7 +11,7 @@ Mcanvas is a plugin that can easily compose the image, text, watermark and expor
 ## Installation
 
 - You can download the latest version from the [GitHub](https://github.com/xd-tayde/mcanvas/blob/master/dist/mcanvas.min.js) 
-- use a npm [CDN](https://unpkg.com/mcanvas@1.1.3/dist/mcanvas.min.js).
+- use a npm [CDN](https://unpkg.com/mcanvas/dist/mcanvas.min.js).
 - Or you can install via npm:
 
 ```js
