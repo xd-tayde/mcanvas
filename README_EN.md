@@ -9,13 +9,13 @@ create the canvas by width and height;
 params:
 
 	// the width of origin canvas;
-	width : type : Number; 
-			 Default : 500; 
+	width : type : Number;
+			 Default : 500;
 			 required;
 
 	// the height of origin canvas;
-	height: type : Number; 
-			Default : width; 
+	height: type : Number;
+			Default : width;
 			optional;
 
 ## method
@@ -26,7 +26,7 @@ prepare background-image；
 
 bg: optional ，default: init-bg；
 
-> if you use `mc.background(bg)` before , then you can use `mc.background()` to reset to the init background. 
+> if you use `mc.background(bg)` before , then you can use `mc.background()` to reset to the init background.
 
 params:
 
@@ -141,10 +141,10 @@ options:{
 	 // example :  width: 100 / '100%' / '100px';
     width : 300,
 
-    // align of text line; 
+    // align of text line;
     // 'left'/'center'/'right';
     align : 'left',
-    
+
     // the default normal font-size is 5% of the width of canvas;
     // smallStyle is 0.9 on normal;
     // largeStyle is 1.2 on normal;
@@ -190,7 +190,17 @@ final function ，`add`/`watermark`/`text` must use the `draw()` on the end, and
 params:
 
 ```js
-mc.draw(b64 =>{
+mc.draw({
+    // the type of export image :  png/jpg/jpeg/webp;
+    // default : png;
+    type: 'png',
 
+    //  the quality of export image : 0~1；
+	//  it's invalid to png type;
+    // default: .9;
+    quality: 1,
+    callback(b64){
+        console.log(b64);
+    }
 })
 ```

@@ -9,7 +9,7 @@ let $clear = $('.js-clear');
 
 let data = {
     addImageOps : {
-        image:'images/ear.png',
+        image:'http://mtapplet.meitudata.com/57ea433108c45eb2b166.jpg',
         options:{
             width:482,
             pos:{
@@ -50,8 +50,7 @@ let data = {
 };
 
 let mc = new MCanvas(1000,1000,'black');
-mc.background({
-    image:'http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',
+mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
     left:0,
     top:0,
     color:'#000000',
@@ -104,14 +103,19 @@ $sure.on('click',function(){
 function mcDraw(ops,type){
     switch (type) {
         case `image`:
-            mc.add(ops.image,ops.options).draw({
-                type:'jpg',
-                quality:.9,
-                callback(b64){
-                    $result.attr('src',b64);
-                    $dialog.hide();
-                },
-            });
+            let img = new Image();
+            img.crossOrigin = '*';
+            img.onload = function(){
+                mc.add(img,ops.options).draw({
+                    type:'jpg',
+                    quality:.9,
+                    callback(b64){
+                        $result.attr('src',b64);
+                        $dialog.hide();
+                    },
+                });
+            };
+            img.src = ops.image;
             break;
         case `watermark`:
             mc.watermark(ops.image,ops.options).draw(b64=>{

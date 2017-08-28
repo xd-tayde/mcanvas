@@ -102,10 +102,10 @@ MCanvas.prototype._init = function () {
 // 绘制背景部分；
 // --------------------------------------------------------
 
-MCanvas.prototype.background = function (bg) {
+MCanvas.prototype.background = function (image, bg) {
     var _this = this;
 
-    if (!bg) {
+    if (!bg && !image) {
         if (this.bgConfig) {
             bg = this.bgConfig;
         } else {
@@ -113,6 +113,7 @@ MCanvas.prototype.background = function (bg) {
             return;
         }
     } else {
+        bg.image = image;
         this.bgConfig = bg;
     }
     this.queue.push(function () {
@@ -296,7 +297,7 @@ MCanvas.prototype.add = function () {
 };
 
 MCanvas.prototype._add = function (img, ops) {
-    if (ops.width == 0) console.log('the width of mc-element is zero');
+    if (ops.width == 0) console.warn('mcanvas warn: the width of mc-element is zero');
 
     var _getSize2 = this._getSize(img),
         iw = _getSize2.iw,

@@ -108,10 +108,10 @@ MCanvas.prototype._init = function () {
 // 绘制背景部分；
 // --------------------------------------------------------
 
-MCanvas.prototype.background = function (bg) {
+MCanvas.prototype.background = function (image, bg) {
     var _this = this;
 
-    if (!bg) {
+    if (!bg && !image) {
         if (this.bgConfig) {
             bg = this.bgConfig;
         } else {
@@ -119,6 +119,7 @@ MCanvas.prototype.background = function (bg) {
             return;
         }
     } else {
+        bg.image = image;
         this.bgConfig = bg;
     }
     this.queue.push(function () {
@@ -302,7 +303,7 @@ MCanvas.prototype.add = function () {
 };
 
 MCanvas.prototype._add = function (img, ops) {
-    if (ops.width == 0) console.log('the width of mc-element is zero');
+    if (ops.width == 0) console.warn('mcanvas warn: the width of mc-element is zero');
 
     var _getSize2 = this._getSize(img),
         iw = _getSize2.iw,
@@ -709,7 +710,7 @@ var $clear = $('.js-clear');
 
 var data = {
     addImageOps: {
-        image: 'images/ear.png',
+        image: 'http://mtapplet.meitudata.com/57ea433108c45eb2b166.jpg',
         options: {
             width: 482,
             pos: {
@@ -750,8 +751,7 @@ var data = {
 };
 
 var mc = new MCanvas(1000, 1000, 'black');
-mc.background({
-    image: 'http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',
+mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
     left: 0,
     top: 0,
     color: '#000000',
@@ -806,14 +806,19 @@ $sure.on('click', function () {
 function mcDraw(ops, type) {
     switch (type) {
         case 'image':
-            mc.add(ops.image, ops.options).draw({
-                type: 'jpg',
-                quality: .9,
-                callback: function callback(b64) {
-                    $result.attr('src', b64);
-                    $dialog.hide();
-                }
-            });
+            var img = new Image();
+            img.crossOrigin = '*';
+            img.onload = function () {
+                mc.add(img, ops.options).draw({
+                    type: 'jpg',
+                    quality: .9,
+                    callback: function callback(b64) {
+                        $result.attr('src', b64);
+                        $dialog.hide();
+                    }
+                });
+            };
+            img.src = ops.image;
             break;
         case 'watermark':
             mc.watermark(ops.image, ops.options).draw(function (b64) {

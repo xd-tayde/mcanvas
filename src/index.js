@@ -48,8 +48,8 @@ MCanvas.prototype._init = function(){
 // 绘制背景部分；
 // --------------------------------------------------------
 
-MCanvas.prototype.background = function(bg){
-    if(!bg){
+MCanvas.prototype.background = function(image,bg){
+    if(!bg && !image){
         if(this.bgConfig){
             bg = this.bgConfig;
         }else{
@@ -57,6 +57,7 @@ MCanvas.prototype.background = function(bg){
             return;
         }
     }else{
+        bg.image = image;
         this.bgConfig = bg;
     }
     this.queue.push(() => {
@@ -76,7 +77,6 @@ MCanvas.prototype.background = function(bg){
 };
 
 MCanvas.prototype._background = function(img,bg){
-
     let {iw,ih} = this._getSize(img);
     // 图片与canvas的长宽比；
     let iRatio = iw / ih;
@@ -216,7 +216,7 @@ MCanvas.prototype.add = function(image = '',options){
 };
 
 MCanvas.prototype._add = function(img,ops){
-    if(ops.width==0)console.log(`the width of mc-element is zero`);
+    if(ops.width==0)console.warn(`mcanvas warn: the width of mc-element is zero`);
     let {iw,ih} = this._getSize(img);
     let ratio = iw / ih;
     // 画布canvas参数；
