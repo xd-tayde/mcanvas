@@ -216,6 +216,7 @@ MCanvas.prototype.add = function(image = '',options){
 };
 
 MCanvas.prototype._add = function(img,ops){
+    if(ops.width==0)console.log(`the width of mc-element is zero`);
     let {iw,ih} = this._getSize(img);
     let ratio = iw / ih;
     // 画布canvas参数；
@@ -535,12 +536,23 @@ MCanvas.prototype._get = function(par,child,str,type){
 };
 
 // 绘制函数；
-MCanvas.prototype.draw = function(fn = ()=>{}){
+MCanvas.prototype.draw = function(ops){
     let b64;
+    let _ops = {
+        type:'png',
+        quality:.9,
+        callback(){},
+    };
+    if(typeof ops == 'function'){
+        _ops.callback = ops;
+    }else{
+        _ops = _.extend(_ops,ops);
+        if(_ops.type == 'jpg')_ops.type = 'jpeg';
+    }
     this.end = () => {
         setTimeout(()=>{
-            b64 = this.canvas.toDataURL('image/png');
-            fn(b64);
+            b64 = this.canvas.toDataURL(`image/${_ops.type}`, _ops.quality);
+            _ops.callback(b64);
         },0);
     };
     this._next();

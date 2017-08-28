@@ -104,9 +104,13 @@ $sure.on('click',function(){
 function mcDraw(ops,type){
     switch (type) {
         case `image`:
-            mc.add(ops.image,ops.options).draw(b64=>{
-                $result.attr('src',b64);
-                $dialog.hide();
+            mc.add(ops.image,ops.options).draw({
+                type:'jpg',
+                quality:.9,
+                callback(b64){
+                    $result.attr('src',b64);
+                    $dialog.hide();
+                },
             });
             break;
         case `watermark`:

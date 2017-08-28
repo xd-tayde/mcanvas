@@ -296,6 +296,8 @@ MCanvas.prototype.add = function () {
 };
 
 MCanvas.prototype._add = function (img, ops) {
+    if (ops.width == 0) console.log('the width of mc-element is zero');
+
     var _getSize2 = this._getSize(img),
         iw = _getSize2.iw,
         ih = _getSize2.ih;
@@ -660,16 +662,25 @@ MCanvas.prototype._get = function (par, child, str, type) {
 };
 
 // 绘制函数；
-MCanvas.prototype.draw = function () {
+MCanvas.prototype.draw = function (ops) {
     var _this5 = this;
 
-    var fn = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
-
     var b64 = void 0;
+    var _ops = {
+        type: 'png',
+        quality: .9,
+        callback: function callback() {}
+    };
+    if (typeof ops == 'function') {
+        _ops.callback = ops;
+    } else {
+        _ops = _.extend(_ops, ops);
+        if (_ops.type == 'jpg') _ops.type = 'jpeg';
+    }
     this.end = function () {
         setTimeout(function () {
-            b64 = _this5.canvas.toDataURL('image/png');
-            fn(b64);
+            b64 = _this5.canvas.toDataURL('image/' + _ops.type, _ops.quality);
+            _ops.callback(b64);
         }, 0);
     };
     this._next();
@@ -789,9 +800,13 @@ $sure.on('click', function () {
 function mcDraw(ops, type) {
     switch (type) {
         case 'image':
-            mc.add(ops.image, ops.options).draw(function (b64) {
-                $result.attr('src', b64);
-                $dialog.hide();
+            mc.add(ops.image, ops.options).draw({
+                type: 'jpg',
+                quality: .9,
+                callback: function callback(b64) {
+                    $result.attr('src', b64);
+                    $dialog.hide();
+                }
             });
             break;
         case 'watermark':
