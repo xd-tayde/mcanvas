@@ -9,7 +9,7 @@ let $clear = $('.js-clear');
 
 let data = {
     addImageOps : {
-        image:'http://mtapplet.meitudata.com/57ea433108c45eb2b166.jpg',
+        image:'./images/ear.png',
         options:{
             width:482,
             pos:{

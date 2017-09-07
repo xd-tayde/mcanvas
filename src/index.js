@@ -218,11 +218,13 @@ MCanvas.prototype.add = function(image = '',options){
 MCanvas.prototype._add = function(img,ops){
     if(ops.width==0)console.warn(`mcanvas warn: the width of mc-element is zero`);
     let {iw,ih} = this._getSize(img);
-    let ratio = iw / ih;
+    // let ratio = iw / ih;
     // 画布canvas参数；
     let cdx,cdy,cdw,cdh;
     // 素材canvas参数；
     let { x:lsx, y:lsy, width:lsw, height:lsh} = ops.crop;
+
+    let cratio = lsw / lsh;
     let ldx,ldy,ldw,ldh;
     // 素材canvas的绘制;
     let lcvs = document.createElement('canvas');
@@ -234,17 +236,18 @@ MCanvas.prototype._add = function(img,ops){
     let lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4;
     let spaceX,spaceY;
 
-    lcvs.width =  iw * lctxScale;
-    lcvs.height = ih * lctxScale;
+    lcvs.width =  lsw * lctxScale;
+    lcvs.height = lsh * lctxScale;
 
     // 从素材canvas的中心点开始绘制；
-    ldx = -iw / 2;
-    ldy = -ih / 2;
-    ldw = iw;
-    ldh = ih;
+    ldx = -lsw / 2;
+    ldy = -lsh / 2;
+    ldw = lsw;
+    ldh = lsw / cratio;
 
     lctx.translate(lcvs.width/2,lcvs.height/2);
     lctx.rotate(ops.pos.rotate);
+
     lctx.drawImage(img,lsx,lsy,lsw,lsh,ldx,ldy,ldw,ldh);
     //
     // lcvs.style = 'width:300px';
@@ -252,10 +255,10 @@ MCanvas.prototype._add = function(img,ops){
 
     // 获取素材最终的宽高;
     cdw = ops.width * lctxScale;
-    cdh = cdw / ratio;
+    cdh = cdw / cratio;
 
     spaceX = (lctxScale - 1) * ops.width / 2;
-    spaceY = spaceX / ratio;
+    spaceY = spaceX / cratio;
 
     // 获取素材的位置；
     //    配置的位置 - 缩放的影响 - 绘制成正方形的影响；
@@ -304,12 +307,14 @@ MCanvas.prototype._handleOps = function(ops,img){
 
     // 裁剪参数；
     let { x:cropx,y:cropy,width:cropw,height:croph } = ops.crop;
-    let crop = {
-        x: this._get(cw,iw,cropx,'crop'),
-        y: this._get(ch,ih,cropy,'crop'),
-        width:this._get(cw,iw,cropw,'crop'),
-        height:this._get(ch,ih,croph,'crop'),
-    };
+    let crop = {};
+    crop.width = this._get(cw,iw,cropw,'crop');
+    crop.height = this._get(ch,ih,croph,'crop');
+    crop.x = this._get(iw,crop.width,cropx,'crop');
+    crop.y = this._get(ih,crop.height,cropy,'crop');
+
+    console.log(crop);
+
     // 最大值判定；
     if(crop.x > iw)crop.x = iw;
     if(crop.y > ih)crop.y = ih;
@@ -398,6 +403,7 @@ MCanvas.prototype._parse = function(context){
     }
     return result;
 };
+
 MCanvas.prototype._text = function(textArr,option){
     // 处理宽度参数；
     option.width = this._get(this.canvas.width,0,option.width,'pos');
