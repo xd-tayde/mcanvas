@@ -18,6 +18,12 @@ let data = {
                 scale:1,
                 rotate:1,
             },
+            crop:{
+                x:50,
+                y:50,
+                width:10000,
+                height:10000,
+            },
         },
     },
     addWmOps : {

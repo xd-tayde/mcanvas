@@ -672,7 +672,7 @@ MCanvas.prototype._get = function (par, child, str, type) {
             result = +str;
         }
     }
-    return result;
+    return Math.floor(result);
 };
 
 // 绘制函数；

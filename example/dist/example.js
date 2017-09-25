@@ -672,7 +672,7 @@ MCanvas.prototype._get = function (par, child, str, type) {
             result = +str;
         }
     }
-    return result;
+    return Math.floor(result);
 };
 
 // 绘制函数；
@@ -725,6 +725,12 @@ var data = {
                 y: 58,
                 scale: 1,
                 rotate: 1
+            },
+            crop: {
+                x: 50,
+                y: 50,
+                width: 10000,
+                height: 10000
             }
         }
     },
