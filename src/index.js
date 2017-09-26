@@ -1,10 +1,10 @@
 import _ from './utils';
 
-export default function MCanvas(cwidth,cheight,background){
+export default function MCanvas(cwidth,cheight,backgroundColor){
 
     // 兼容不使用 new 的方式；
     if (!(this instanceof MCanvas))
-        return new MCanvas(cwidth,cheight,background);
+        return new MCanvas(cwidth,cheight,backgroundColor);
 
     // 配置canvas初始大小；
     // cwidth：画布宽度，Number,选填，默认为 500;
@@ -12,7 +12,7 @@ export default function MCanvas(cwidth,cheight,background){
     this.ops = {
         width: cwidth || 500,
         height:cheight || cwidth,
-        background,
+        backgroundColor,
     };
     // 全局画布；
     this.canvas = null;
@@ -38,8 +38,8 @@ MCanvas.prototype._init = function(){
     this.canvas.width = this.ops.width;
     this.canvas.height = this.ops.height;
     this.ctx = this.canvas.getContext('2d');
-    if(this.ops.background){
-        this.ctx.fillStyle = this.ops.background;
+    if(this.ops.backgroundColor){
+        this.ctx.fillStyle = this.ops.backgroundColor;
         this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
     }
 };
@@ -239,21 +239,47 @@ MCanvas.prototype._add = function(img,ops){
     lcvs.width =  lsw * lctxScale;
     lcvs.height = lsh * lctxScale;
 
+    // 限制canvas的大小，ios8以下为 2096, 其余平台均限制为 4096;
+    let shrink;
+    if(_.isIos8() && (lcvs.width > 2096 || lcvs.height > 2096)){
+        if(cratio > 1){
+            shrink = 2096 / lcvs.width;
+        }else{
+            shrink = 2096 / lcvs.height;
+        }
+    }else if(lcvs.width > 4096 || lcvs.height > 4096){
+        if(cratio > 1){
+            shrink = 4096 / lcvs.width;
+        }else{
+            shrink = 4096 / lcvs.height;
+        }
+    }
+
     // 从素材canvas的中心点开始绘制；
-    ldx = -lsw / 2;
-    ldy = -lsh / 2;
+    ldx = -Math.round(lsw / 2);
+    ldy = -Math.round(lsh / 2);
     ldw = lsw;
-    ldh = lsw / cratio;
+    ldh = Math.round(lsw / cratio);
+
+    // 获取素材最终的宽高;
+
+    if(shrink){
+        lcvs.width = Math.round(lcvs.width * shrink);
+        lcvs.height = Math.round(lcvs.height * shrink);
+        ldx = Math.round(ldx * shrink);
+        ldy = Math.round(ldy * shrink);
+        ldw = Math.round(ldw * shrink);
+        ldh = Math.round(ldh * shrink);
+    }
 
     lctx.translate(lcvs.width/2,lcvs.height/2);
     lctx.rotate(ops.pos.rotate);
 
     lctx.drawImage(img,lsx,lsy,lsw,lsh,ldx,ldy,ldw,ldh);
-    //
-    // lcvs.style = 'width:300px';
+
+    // lcvs.style.width = '300px';
     // document.querySelector('body').appendChild(lcvs);
 
-    // 获取素材最终的宽高;
     cdw = ops.width * lctxScale;
     cdh = cdw / cratio;
 
@@ -312,8 +338,6 @@ MCanvas.prototype._handleOps = function(ops,img){
     crop.height = this._get(ch,ih,croph,'crop');
     crop.x = this._get(iw,crop.width,cropx,'crop');
     crop.y = this._get(ih,crop.height,cropy,'crop');
-
-    console.log(crop);
 
     // 最大值判定；
     if(crop.x > iw)crop.x = iw;
@@ -538,7 +562,7 @@ MCanvas.prototype._get = function(par,child,str,type){
             result = +str;
         }
     }
-    return Math.floor(result);
+    return Math.round(result);
 };
 
 // 绘制函数；

@@ -51,4 +51,14 @@ export default {
             }
         }
     },
+    isIos8(){
+        let UA = window.navigator.userAgent.toLowerCase();
+        let IOS = /(iPhone|iPad|iPod|iOS)/gi.test(UA);
+        let IPAD = /(iPad)/gi.test(UA);
+        if(IOS){
+            return IPAD ? UA.match(/cpu os (\d*)/)[1] < 9 : UA.match(/iphone os (\d*)/)[1] < 9;
+        }else{
+            return false;
+        }
+    },
 };

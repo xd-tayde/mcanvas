@@ -6,6 +6,8 @@
 
 ## 更新：
 
+- 1.2.3 (9.26)
+    - 增加素材`canvas`大小的限制，ios8为2096，其余限制为4096；
 - 1.2.2 (9.25)
     - 增加参数的向下取整；
 - 1.2.1 (9.7)
@@ -108,17 +110,26 @@ mc.background({
 
 ### 创建实例：
 
-#### `new MCanvas(width,height)` || `MCanvas(width,height)`:
+#### `new MCanvas(width,height,backgroundColor)` || `MCanvas(width,height,backgroundColor)`:
 
 创建画布，初始化 `Canvas` ;
 
 params:
 
 	width : 画布初始宽度;
-		type : Number; Default : 500; required;
+		type : Number;
+        Default : 500;  
+        required;
 
 	height: 画布初始高度;
-		type : Number; Default : width; optional;
+		type : Number;
+        Default : width;  
+        optional;
+
+    backgroundColor:画布初始化背景颜色；
+        type : color;
+        Default : undefined;  
+        optional;
 
 ### 方法：
 

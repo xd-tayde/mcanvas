@@ -2,7 +2,7 @@
 
 ## create instance
 
-#### `new MCanvas(width,height)` || `MCanvas(width,height)`:
+#### `new MCanvas(width,height,backgroundColor)` || `MCanvas(width,height,backgroundColor)`:
 
 create the canvas by width and height;
 
@@ -16,6 +16,11 @@ params:
 	// the height of origin canvas;
 	height: type : Number;
 			Default : width;
+			optional;
+
+	// the background-color of origin canvas;
+	backgroundColor: type : color;
+			Default : undefined;
 			optional;
 
 ## method

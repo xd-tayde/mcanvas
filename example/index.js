@@ -10,6 +10,7 @@ let $clear = $('.js-clear');
 let data = {
     addImageOps : {
         image:'./images/ear.png',
+        // image:'https://mtapplet.meitudata.com/59c8c479521876738.jpg',
         options:{
             width:482,
             pos:{
@@ -17,12 +18,6 @@ let data = {
                 y:58,
                 scale:1,
                 rotate:1,
-            },
-            crop:{
-                x:50,
-                y:50,
-                width:10000,
-                height:10000,
             },
         },
     },
@@ -55,11 +50,11 @@ let data = {
     },
 };
 
-let mc = new MCanvas(1000,1000,'black');
+let mc = new MCanvas(1000,1000,'white');
 mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
     left:0,
     top:0,
-    color:'#000000',
+    // color:'#000000',
     type:'origin',
 });
 
