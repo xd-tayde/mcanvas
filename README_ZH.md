@@ -5,11 +5,15 @@
 在业务中，经常遇到各种合成图片的需求，如贴纸的合成，合成文字，添加水印等，因为这些业务经常需要进行各种位置，状态等参数的计算，写起来并不是那么方便。该插件就是为了解决这部分难点，封装底层 `API` 及各种计算，提供出使用更为简单的 `API`，减少项目上的重复工作，提高效率；
 
 ## 更新：
+- 1.2.5 (9.27)
+    - 修复文档错误；
 
 - 1.2.3 (9.26)
     - 增加素材`canvas`大小的限制，ios8为2096，其余限制为4096；
+
 - 1.2.2 (9.25)
     - 增加参数的向下取整；
+
 - 1.2.1 (9.7)
     - 修改 `add` 函数中的 `crop` 裁剪功能BUG；
 
@@ -52,20 +56,18 @@
 	- 修改 bigStyle --> largeStyle;
 
 
-## 基础使用：
+## 简单示例(详细功能请查询API)：
 
 由于图片的合成是异步且严格遵循顺序的，因此将使用的形式设计成了链式的方式，这种方式更为语义化且符合逻辑；
 
 首先需要一系列的素材准备，将要绘制的素材 `add` 进 `queue` 队列中，最后再调用 `draw()` 进行绘制及导出；
 
 ```js
-
 // 创建画布，初始化 canvas；
 let mc = new MC(width,height);
 
 // background : 准备底图；提供多种模式
-mc.background({
-    image:'',
+mc.background('imageUrl',{
     left:0,
     top:0,
     color:'#000000',
@@ -133,21 +135,21 @@ params:
 
 ### 方法：
 
-#### 1、 `mc.background(bg)`:
+#### 1、 `mc.background(image,options)`:
 
 绘制画布的底图；
 
-bg: optional ，如果不填，则使用 默认参数；
+options: optional ，如果不填，则使用 默认参数；
 
 > 每次绘制背景后，都会将参数储存为 默认值，因此可以通过不传值调用该函数来恢复背景图初始化；
 
 params:
 
 ```js
-bg : {
-	// 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
-    image:'' ,
+// 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
+image:'' ,
 
+options : {
     // 绘制方式: origin / crop / contain
     	// origin : 原图模式，画布与背景图大小一致，忽略初始化传入的画布宽高；忽略 left/top值；
     	// crop : 裁剪模式，背景图自适应铺满画布，多余部分裁剪；可通过 left/top值控制裁剪部分；

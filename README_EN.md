@@ -25,22 +25,22 @@ params:
 
 ## method
 
-#### 1、 `mc.background(bg)`:
+#### 1、 `mc.background(image,options)`:
 
 prepare background-image；
 
-bg: optional ，default: init-bg；
+options: optional ，default: init-bg；
 
 > if you use `mc.background(bg)` before , then you can use `mc.background()` to reset to the init background.
 
 params:
 
 ```js
-bg : {
-	// background-image,
-	// type: url/HTMLImageElement/HTMLCanvasElement
-    image:'' ,
+// background-image,
+// type: url/HTMLImageElement/HTMLCanvasElement
+image:'' ,
 
+options : {
     // type: origin / crop / contain
     	// origin : the width and height of canvas will be same as the image naturalWidth and naturalHeight, the init width and height will be invalid;
     	// crop : the image will covered with the canvas, can control crop by left and top;
