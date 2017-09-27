@@ -65,6 +65,8 @@ var _ = {
     }
 };
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 function MCanvas(cwidth, cheight, backgroundColor) {
 
     // 兼容不使用 new 的方式；
@@ -142,6 +144,23 @@ MCanvas.prototype.background = function (image, bg) {
     return this;
 };
 
+MCanvas.prototype._getBgAlign = function (left, iw, cropScale) {
+    var rv = void 0;
+    if (typeof left == 'string') {
+        if (left == '50%') {
+            rv = Math.abs((iw - this.canvas.width / cropScale) / 2);
+        } else if (left == '100%') {
+            rv = Math.abs(iw - this.canvas.width / cropScale);
+        } else if (left == '0%') {
+            rv = 0;
+        }
+    } else if (typeof left == 'number') {
+        rv = left;
+    } else {
+        rv = 0;
+    }
+    return rv;
+};
 MCanvas.prototype._background = function (img, bg) {
     var _getSize = this._getSize(img),
         iw = _getSize.iw,
@@ -160,18 +179,23 @@ MCanvas.prototype._background = function (img, bg) {
         dy = void 0,
         dwidth = void 0,
         dheight = void 0;
+    var cropScale = void 0;
     switch (bg.type) {
         // 裁剪模式，固定canvas大小，原图铺满，超出的部分裁剪；
         case 'crop':
-            sx = bg.left || 0;
-            sy = bg.top || 0;
             if (iRatio > cRatio) {
                 swidth = ih * cRatio;
                 sheight = ih;
+                cropScale = this.canvas.height / ih;
             } else {
                 swidth = iw;
                 sheight = swidth / cRatio;
+                cropScale = this.canvas.width / iw;
             }
+
+            sx = this._getBgAlign(bg.left, iw, cropScale);
+            sy = this._getBgAlign(bg.top, ih, cropScale);
+
             dy = dx = 0;
             dheight = this.canvas.height;
             dwidth = this.canvas.width;
@@ -370,14 +394,19 @@ MCanvas.prototype._add = function (img, ops) {
     ldh = Math.round(lsw / cratio);
 
     // 获取素材最终的宽高;
-
     if (shrink) {
-        lcvs.width = Math.round(lcvs.width * shrink);
-        lcvs.height = Math.round(lcvs.height * shrink);
-        ldx = Math.round(ldx * shrink);
-        ldy = Math.round(ldy * shrink);
-        ldw = Math.round(ldw * shrink);
-        ldh = Math.round(ldh * shrink);
+        var _map = [lcvs.width, lcvs.height, ldx, ldy, ldw, ldh].map(function (v) {
+            return Math.round(v * shrink);
+        });
+
+        var _map2 = _slicedToArray(_map, 6);
+
+        lcvs.width = _map2[0];
+        lcvs.height = _map2[1];
+        ldx = _map2[2];
+        ldy = _map2[3];
+        ldw = _map2[4];
+        ldh = _map2[5];
     }
 
     lctx.translate(lcvs.width / 2, lcvs.height / 2);
@@ -786,10 +815,8 @@ var data = {
     }
 };
 
-var mc = new MCanvas(1000, 1000, 'white');
+var mc = new MCanvas(1000, 1000, 'black');
 mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
-    left: 0,
-    top: 0,
     // color:'#000000',
     type: 'origin'
 });

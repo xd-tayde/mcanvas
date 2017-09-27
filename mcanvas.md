@@ -47,6 +47,3 @@ MC(width,height)
 	 console.log(b64);
 });
 ```
-
-
-

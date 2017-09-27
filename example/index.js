@@ -50,10 +50,8 @@ let data = {
     },
 };
 
-let mc = new MCanvas(1000,1000,'white');
+let mc = new MCanvas(1000,1000,'black');
 mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
-    left:0,
-    top:0,
     // color:'#000000',
     type:'origin',
 });

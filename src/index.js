@@ -76,6 +76,23 @@ MCanvas.prototype.background = function(image,bg){
     return this;
 };
 
+MCanvas.prototype._getBgAlign = function(left,iw,cropScale){
+    let rv;
+    if(typeof left == 'string'){
+        if(left == '50%'){
+            rv = Math.abs((iw - this.canvas.width / cropScale) / 2);
+        }else if(left == '100%'){
+            rv = Math.abs(iw - this.canvas.width / cropScale);
+        }else if(left == '0%'){
+            rv = 0;
+        }
+    }else if(typeof left == 'number'){
+        rv = left;
+    }else{
+        rv = 0;
+    }
+    return rv;
+};
 MCanvas.prototype._background = function(img,bg){
     let {iw,ih} = this._getSize(img);
     // 图片与canvas的长宽比；
@@ -83,18 +100,23 @@ MCanvas.prototype._background = function(img,bg){
     let cRatio = this.canvas.width / this.canvas.height;
     // 背景绘制参数；
     let sx,sy,swidth,sheight,dx,dy,dwidth,dheight;
+    let cropScale;
     switch (bg.type) {
         // 裁剪模式，固定canvas大小，原图铺满，超出的部分裁剪；
         case 'crop':
-            sx = bg.left || 0;
-            sy = bg.top || 0;
             if(iRatio > cRatio){
                 swidth = ih * cRatio;
                 sheight = ih;
+                cropScale = this.canvas.height / ih;
             }else{
                 swidth = iw;
                 sheight = swidth / cRatio;
+                cropScale = this.canvas.width / iw;
             }
+
+            sx = this._getBgAlign(bg.left,iw,cropScale);
+            sy = this._getBgAlign(bg.top,ih,cropScale);
+
             dy = dx = 0;
             dheight = this.canvas.height;
             dwidth = this.canvas.width;
@@ -256,20 +278,14 @@ MCanvas.prototype._add = function(img,ops){
     }
 
     // 从素材canvas的中心点开始绘制；
-    ldx = -Math.round(lsw / 2);
-    ldy = -Math.round(lsh / 2);
+    ldx = - Math.round(lsw / 2);
+    ldy = - Math.round(lsh / 2);
     ldw = lsw;
     ldh = Math.round(lsw / cratio);
 
     // 获取素材最终的宽高;
-
     if(shrink){
-        lcvs.width = Math.round(lcvs.width * shrink);
-        lcvs.height = Math.round(lcvs.height * shrink);
-        ldx = Math.round(ldx * shrink);
-        ldy = Math.round(ldy * shrink);
-        ldw = Math.round(ldw * shrink);
-        ldh = Math.round(ldh * shrink);
+        [lcvs.width,lcvs.height,ldx,ldy,ldw,ldh] = [lcvs.width,lcvs.height,ldx,ldy,ldw,ldh].map( v => Math.round(v*shrink));
     }
 
     lctx.translate(lcvs.width/2,lcvs.height/2);

@@ -48,7 +48,8 @@ options : {
     type:'origin',
 
     // the distance of leftTop corner of canvas;
-    left:0,
+	// can use 0% / 50% / 100% to crop by left / center / right;
+    left:'50%',
     top:0,
 
     // the background-color of canvas;
