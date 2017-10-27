@@ -144,13 +144,13 @@ MCanvas.prototype.background = function (image, bg) {
     return this;
 };
 
-MCanvas.prototype._getBgAlign = function (left, iw, cropScale) {
+MCanvas.prototype._getBgAlign = function (left, iw, cw, cropScale) {
     var rv = void 0;
     if (typeof left == 'string') {
-        if (left == '50%') {
-            rv = Math.abs((iw - this.canvas.width / cropScale) / 2);
+        if (left == '50%' || left == 'center') {
+            rv = Math.abs((iw - cw / cropScale) / 2);
         } else if (left == '100%') {
-            rv = Math.abs(iw - this.canvas.width / cropScale);
+            rv = Math.abs(iw - cw / cropScale);
         } else if (left == '0%') {
             rv = 0;
         }
@@ -193,8 +193,8 @@ MCanvas.prototype._background = function (img, bg) {
                 cropScale = this.canvas.width / iw;
             }
 
-            sx = this._getBgAlign(bg.left, iw, cropScale);
-            sy = this._getBgAlign(bg.top, ih, cropScale);
+            sx = this._getBgAlign(bg.left, iw, this.canvas.width, cropScale);
+            sy = this._getBgAlign(bg.top, ih, this.canvas.height, cropScale);
 
             dy = dx = 0;
             dheight = this.canvas.height;

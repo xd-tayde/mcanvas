@@ -50,10 +50,13 @@ let data = {
     },
 };
 
-let mc = new MCanvas(1000,1000,'black');
-mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
+let mc = new MCanvas(1000,1500,'black');
+// mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
+mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
     // color:'#000000',
-    type:'origin',
+    type:'crop',
+    left:'50%',
+    top:'50%',
 });
 
 let timer;
