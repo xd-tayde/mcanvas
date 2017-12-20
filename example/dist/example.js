@@ -771,6 +771,11 @@ MCanvas.prototype._next = function () {
     }
 };
 
+MCanvas.prototype.clear = function () {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    return this;
+};
+
 var $sure = $('.js-sure');
 var $params = $('.js-params');
 var $dialog = $('.js-dialog');
@@ -822,10 +827,9 @@ var data = {
 };
 
 var mc = new MCanvas(1000, 1500, 'black');
-// mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
-mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg', {
-    // color:'#000000',
-    type: 'crop',
+mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
+    // mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
+    type: 'origin',
     left: '50%',
     top: '50%'
 });
@@ -849,9 +853,10 @@ $cancel.on('click', function () {
 });
 
 $clear.on('click', function () {
-    mc.background().draw(function (b64) {
-        $result.attr('src', b64);
-    });
+    mc.clear();
+    // mc.background().clear().draw(b64=>{
+    //     $result.attr('src',b64);
+    // });
 });
 
 $('.js-addImage').on('click', function () {

@@ -51,10 +51,9 @@ let data = {
 };
 
 let mc = new MCanvas(1000,1500,'black');
-// mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
-mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
-    // color:'#000000',
-    type:'crop',
+mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
+// mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
+    type:'origin',
     left:'50%',
     top:'50%',
 });
@@ -76,9 +75,10 @@ $cancel.on('click',()=>{
 });
 
 $clear.on('click',()=>{
-    mc.background().draw(b64=>{
-        $result.attr('src',b64);
-    });
+    mc.clear();
+    // mc.background().clear().draw(b64=>{
+    //     $result.attr('src',b64);
+    // });
 });
 
 $('.js-addImage').on('click',()=>{

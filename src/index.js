@@ -611,3 +611,8 @@ MCanvas.prototype._next = function(){
         this.end();
     }
 };
+
+MCanvas.prototype.clear = function(){
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    return this;
+};

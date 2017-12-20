@@ -765,5 +765,10 @@ MCanvas.prototype._next = function () {
     }
 };
 
+MCanvas.prototype.clear = function () {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    return this;
+};
+
 export default MCanvas;
 //# sourceMappingURL=mcanvas.es.js.map
