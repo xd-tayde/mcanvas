@@ -5,6 +5,14 @@
 在业务中，经常遇到各种合成图片的需求，如贴纸的合成，合成文字，添加水印等，因为这些业务经常需要进行各种位置，状态等参数的计算，写起来并不是那么方便。该插件就是为了解决这部分难点，封装底层 `API` 及各种计算，提供出使用更为简单的 `API`，减少项目上的重复工作，提高效率；
 
 ## 更新：
+- 1.3.0 (2.22)
+    - 修改新建实例时的参数格式，较为统一且便于拓展；
+    - 优化储存管理分类，实例上新增 `fn` 及 `data` 属性;
+    - 新增Api `mc.rect` / `mc.circle`, 用于绘制矩形和圆形；
+    - 纠正`mc.text`方法定位不准确的问题，并新增描边文字,渐变文字，文字阴影的功能;
+    - 新增错误回调，当图片加载失败是会触发由 `draw` 中传入的 `error`回调;
+    - 优化文档及代码；
+
 - 1.2.9 (12.20)
     - 新增Api `mc.clear`: 清空画布；
 
@@ -73,7 +81,11 @@
 
 ```js
 // 创建画布，初始化 canvas；
-let mc = new MC(width,height);
+let mc = new MC({
+    width: 1000,
+    height: 1000,
+    backgroundColor: 'black',
+});
 
 // background : 准备底图；提供多种模式
 mc.background('imageUrl',{
@@ -121,26 +133,25 @@ mc.background('imageUrl',{
 
 ### 创建实例：
 
-#### `new MCanvas(width,height,backgroundColor)` || `MCanvas(width,height,backgroundColor)`:
+#### `new MCanvas(options)` || `MCanvas(options)`:
 
 创建画布，初始化 `Canvas` ;
 
 params:
 
-	width : 画布初始宽度;
-		type : Number;
-        Default : 500;  
-        required;
+- {Object} options
+	- {Number} width : 画布宽度，可选；
+	- {Number} height : 画布高度，可选；
+	- {Color} backgroundColor : 画布背景颜色，可选；
 
-	height: 画布初始高度;
-		type : Number;
-        Default : width;  
-        optional;
-
-    backgroundColor:画布初始化背景颜色；
-        type : color;
-        Default : undefined;  
-        optional;
+用法:
+```js
+	MCanvas({
+		width : 500,
+		height: 500,
+		backgroundColor: '#fff',
+	})
+```
 
 ### 方法：
 
@@ -148,35 +159,36 @@ params:
 
 绘制画布的底图；
 
-options: optional ，如果不填，则使用 默认参数；
+options: 初次必填，之后可选；
 
 > 每次绘制背景后，都会将参数储存为 默认值，因此可以通过不传值调用该函数来恢复背景图初始化；
 
-params:
+使用方式：
 
 ```js
-// 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
-image:'' ,
+// image : 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
 
-options : {
+mc.background(image, {
+
     // 绘制方式: origin / crop / contain
     	// origin : 原图模式，画布与背景图大小一致，忽略初始化传入的画布宽高；忽略 left/top值；
     	// crop : 裁剪模式，背景图自适应铺满画布，多余部分裁剪；可通过 left/top值控制裁剪部分；
     	// contain : 包含模式, 类似于 background-size:contain; 可通过left/top值进行位置的控制；
     type:'origin',
 
+
     // 背景图片距离画布左上角的距离，
-    // 均可填入 0%/50%/ 100%
+    // 100 / '100%' / '100px'
     // 0% ： 居左裁剪； 50% ：代表居中裁剪； 100% ： 代表居右裁剪
     left:'50%',
     top:0,
 
+
     // 除了背景图外的颜色，仅在 type:contain时可见；
     color:'#000000',
-}
-```
 
-> TIPS：该方法可独立使用，无需通过 `draw()`;
+})
+```
 
 #### 2、`add(image,options)`/`add([{image:'',options:{}},{image:'',options:{}}])`:
 
@@ -253,7 +265,7 @@ options:{
 	// 距离画布边界的 margin 值，
 		// type : Number
 		// Default : 20;
-	margin :
+	margin : 20,
 }
 ```
 
@@ -261,14 +273,13 @@ options:{
 #### 4、`text(context,options)`:
 
 添加文字函数；支持多样式，自动换行；
+新增支持描边文字，渐变文字，文字阴影；
 
-params:
+使用方式：
 
 ```js
 // 文字内容，支持配置三种字体样式，big/normal/small;
-	// 通过标签的形式进行配置；
 	// <b></b> : 大字  |  <s>小字</s> : 小字 |  <br>：换行
-	// Tips : 会根据宽度进行自适应换行处理，另外也可通过 <br> 进行主动换行；
 context : '<b>大字大字大字</b>常规字体<br>换行<s>小字小字小字</s>',
 
 options:{
@@ -280,42 +291,45 @@ options:{
     // 'left'/'center'/'right';
     align : 'left',
 
-    // 为了自适应，默认常规字体大小为 画布 宽度值的 5%;
-    // 小字为常规字体的 0.9 倍；
-    // 大字为常规字体的 1.2 倍；
-    // 字体样式默认为 `helvetica neue,hiragino sans gb,Microsoft YaHei,arial,tahoma,sans-serif`;
-    // 字体颜色默认为 黑色；
-    // lineheight 默认为 内容中最大字体的 1.1 倍
-
-    // 可通过以下参数进行配置；
+    // 可通过 smallStyle/normalStyle/largeStyle 分别进行配置；
     // 小字的样式
-    // the style of contained in <s></s>
+    // 以smallStyle为栗，normalStyle/largeStyle使用方式一致；
     smallStyle:{
-        font : ``,
-        color:'#000',
-        lineheight: 100,
-    },
 
-    // 常规字体的样式
-    // the style of normal font
-    normalStyle:{
+    	 // 文字样式，包含字体/字号等，使用方式与css font一致；
         font : ``,
-        color:'#000',
-        lineheight: 100,
-    },
 
-    // 大字样式；
-    // the style of contained in <b></b>
-    largeStyle:{
-        font : '',
+        // 字体颜色；
         color:'#000',
+
+        // 行高
         lineheight: 100,
+
+        // 类型, 实心字体或者描边字体；
+        type: 'fill' | 'stroke',
+
+        // 当为描边时，该值控制描边宽度；
+        lineWidth: 1,
+
+        // 文字阴影
+        shadow:{
+            color: null,
+            blur: 0,
+            offsetX: 0,
+            offsetY: 0,
+        },
+
+        // 文字渐变
+        gradient:{
+	        type: 2,  // 1: 横向渐变； 2: 纵向渐变；
+	        colorStop: ['red','blue'],
+	     },
     },
 
     // 位置系数，相对于画布；
     // the position of text on canvas;
     pos:{
-    	 // 相对于画布的坐标点，原点为左上点;
+    	 // 文字起始点相对于画布的坐标点，原点为左上点;
     	 // 支持多种值：
     	 // x: 250 / '250px' / '100%' / 'left:250' / 'center',
         x:0,
@@ -323,7 +337,57 @@ options:{
     },
 };
 ```
-#### 5、 `draw(ops)`:
+
+#### 5、`mc.rect(ops)`
+
+与`add`函数相似，该方法用于直接绘制矩形；
+
+```js
+ops: {
+	// 矩形左上角位置，支持多种值；
+	// x: 250 / '250px' / '100%' / 'left:250' / 'center',
+	x: 0,
+	y: 0,
+
+	// 矩形尺寸；
+	width: '100%',
+	height: '100%',
+
+	// 矩形描边宽度
+	strokeWidth : 1,
+	// 矩形描边颜色
+	strokeColor: '#fff',
+
+	// 矩形填充颜色
+	fillColor: '#fff',
+}
+```
+
+#### 6、`mc.circle(ops)`
+
+与`rect`函数相似，该方法用于直接绘制圆形；
+
+```js
+ops: {
+	// 圆形圆心位置，支持多种值；
+	// x: 250 / '250px' / '100%' / 'left:250' / 'center',
+	x: 0,
+	y: 0,
+
+	// 圆形半径； 100 / '100%' / '100px'
+	r: 100,
+
+	// 圆形描边宽度
+	strokeWidth : 1,
+	// 圆形描边颜色
+	strokeColor: '#fff',
+
+	// 圆形填充颜色
+	fillColor: '#fff',
+}
+```
+
+#### 6、 `mc.draw(ops)`:
 
 绘制函数，`add`/`watermark`/`text` 方法都需要在末尾调用该方法进行绘制,且该函数包含导出功能，回调中可直接得到结果图的 `base64` ;
 
@@ -339,13 +403,20 @@ mc.draw({
     //  图片质量，对 png 格式无效； 0~1；
     // default: .9;
     quality: 1,
-    callback(b64){
-        console.log(b64);
+
+    // 成功回调；
+    success(b64){
+    	console.log(b64);
+    },
+
+    // 错误回调；
+    error(err){
+    	console.log(err);
     }
 })
 ```
 
-#### 6、 `clear()`:
+#### 8、 `clear()`:
 
 可以随时清空画布；
 

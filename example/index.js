@@ -28,29 +28,75 @@ let data = {
             pos:'rightBottom',
         },
     },
+    addRectOps:{
+        x: 0,
+        y: 'bottom:0',
+        width: '100%',
+        height: 300,
+        strokeWidth : 5,
+        strokeColor: '#996699',
+        fillColor: 'rgba(0,0,0,.5)',
+    },
+    addCircleOps:{
+        x: 'center',
+        y: 'center',
+        r: 100,
+        strokeWidth : 5,
+        strokeColor: '#996699',
+        fillColor: 'rgba(0,0,0,.5)',
+    },
     addTextOps : {
-        text:'<b>美图</b>前端组啊啊啊啊<s>MCanvas.js</s>',
+        // text:'<b>A</b>BBBBB<s>MCanvas.js</s>',
+        text:'<b>Large/Stroke</b><br>Normal/Gradient<br><s>Small/Shadow</s>',
         options:{
-            width:'200',
-            align:'left',
+            width:'600',
+            align:'center',
             largeStyle:{
                 color:'red',
+                font: '80px Microsoft YaHei,sans-serif',
+                type: 'stroke',
+                lineWidth: 2,
+                lineHeight : 100,
             },
             normalStyle:{
                 color:'blue',
+                font:'70px Microsoft YaHei,sans-serif',
+                // lineHeight : 100,
+                // shadow:{
+                //     color: 'red',
+                //     blur: 4,
+                //     offsetX: 2,
+                //     offsetY: 2,
+                // },
+                gradient:{
+                    type: 2,  // 1: 横向渐变； 2: 纵向渐变；
+                    colorStop: ['red','blue'],
+                },
             },
             smallStyle:{
                 color:'yellow',
+                font:'60px Microsoft YaHei,sans-serif',
+                // lineHeight : 100,
+                shadow:{
+                    color: 'red',
+                    blur: 10,
+                    offsetX: 5,
+                    offsetY: 5,
+                },
             },
             pos:{
                 x:'center',
-                y:'bottom:200',
+                y:'bottom:400',
             },
         },
     },
 };
 
-let mc = new MCanvas(1000,1500,'black');
+let mc = new MCanvas({
+    width: 1000,
+    height: 1500,
+    // backgroundColor: 'black',
+});
 mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
 // mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
     type:'origin',
@@ -75,10 +121,10 @@ $cancel.on('click',()=>{
 });
 
 $clear.on('click',()=>{
-    mc.clear();
-    // mc.background().clear().draw(b64=>{
-    //     $result.attr('src',b64);
-    // });
+    // mc.clear();
+    mc.background().clear().draw(b64=>{
+        $result.attr('src',b64);
+    });
 });
 
 $('.js-addImage').on('click',()=>{
@@ -96,6 +142,14 @@ $('.js-addText').on('click',()=>{
     showDialog(type,data.addTextOps);
 });
 
+$('.js-addRect').on('click',()=>{
+    mcDraw(data.addRectOps, 'rect');
+});
+
+$('.js-addCircle').on('click',()=>{
+    mcDraw(data.addCircleOps, 'circle');
+});
+
 $sure.on('click',function(){
     let ops = $(this).data('ops');
     let type = $(this).data('type');
@@ -103,17 +157,21 @@ $sure.on('click',function(){
 });
 
 function mcDraw(ops,type){
+    let img;
     switch (type) {
         case `image`:
-            let img = new Image();
+            img = new Image();
             img.crossOrigin = '*';
             img.onload = function(){
                 mc.add(img,ops.options).draw({
                     type:'jpg',
                     quality:.9,
-                    callback(b64){
+                    success(b64){
                         $result.attr('src',b64);
                         $dialog.hide();
+                    },
+                    error(err){
+                        console.log('error', err);
                     },
                 });
             };
@@ -131,8 +189,19 @@ function mcDraw(ops,type){
                 $dialog.hide();
             });
             break;
+        case `rect`:
+            mc.rect(ops).draw(b64=>{
+                $result.attr('src',b64);
+                $dialog.hide();
+            });
+            break;
+        case `circle`:
+            mc.circle(ops).draw(b64=>{
+                $result.attr('src',b64);
+                $dialog.hide();
+            });
+            break;
         default:
-
     }
 
 }
@@ -167,7 +236,7 @@ function showDialog(type,ops){
                     <li>}</li>`;
             break;
         case 'text':
-            html = `<li>text:<span style="font-size:12px;">''&lt;b&gt;美图&lt;/b&gt;前端组啊啊啊啊&lt;s&gt;MCanvas.js&lt;/s&gt;''</span></li>
+            html = `<li>text:<span style="font-size:12px;">''&lt;b&gt;Large/Stroke&lt;/b&gt;Normal/Gradient&lt;s&gt;Small/Shadow&lt;/s&gt;''</span></li>
                     <li>options:{</li>
                     <li>${tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
                     <li>${tab}align:

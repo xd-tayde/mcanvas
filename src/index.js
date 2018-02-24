@@ -1,33 +1,36 @@
 import _ from './utils';
 
-export default function MCanvas(cwidth,cheight,backgroundColor){
-
+export default function MCanvas(options){
     // 兼容不使用 new 的方式；
-    if (!(this instanceof MCanvas))
-        return new MCanvas(cwidth,cheight,backgroundColor);
+    if (!(this instanceof MCanvas))return new MCanvas(options);
 
     // 配置canvas初始大小；
-    // cwidth：画布宽度，Number,选填，默认为 500;
-    // cheight: 画布高度，Number，选填，默认与宽度一致；
-    this.ops = {
-        width: cwidth || 500,
-        height:cheight || cwidth,
-        backgroundColor,
-    };
+    // width：画布宽度，Number,选填，默认为 500;
+    // height: 画布高度，Number，选填，默认与宽度一致；
+    this.ops = _.extend({
+        width: 500,
+        height: 500,
+        backgroundColor : '',
+    }, options);
+
     // 全局画布；
     this.canvas = null;
     this.ctx = null;
-
     // 绘制函数队列；
     this.queue = [];
-    // 最后执行的函数；
-    this.end = null;
-
-    // 文字绘制数据；
-    this.textData = {};
-
-    // 背景图数据;
-    this.bgConfig = null;
+    // 回调函数池；
+    this.fn = {
+        // 最后执行的函数；
+        success(){},
+        // 错误回调；
+        error(){},
+    };
+    this.data = {
+        // 文字绘制数据；
+        text : {},
+        // 背景图数据;
+        bgConfig : null,
+    };
 
     // 初始化创建画布；
     this._init();
@@ -38,42 +41,43 @@ MCanvas.prototype._init = function(){
     this.canvas.width = this.ops.width;
     this.canvas.height = this.ops.height;
     this.ctx = this.canvas.getContext('2d');
-    if(this.ops.backgroundColor){
-        this.ctx.fillStyle = this.ops.backgroundColor;
-        this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
-    }
+
+    this.ops.backgroundColor && this.setBgColor(this.ops.backgroundColor);
 };
 
 // --------------------------------------------------------
 // 绘制背景部分；
 // --------------------------------------------------------
 
-MCanvas.prototype.background = function(image,bg){
-    if(!bg && !image){
-        if(this.bgConfig){
-            bg = this.bgConfig;
-        }else{
-            console.error('mcanvas error : the init background must has the bg option params.');
-            return;
-        }
+MCanvas.prototype.background = function(image, bg = {
+    type : 'origin',
+}){
+    if(!image && !this.data.bgConfig){
+        console.error('mcanvas error : the init background must has a image.');
+        return;
+    }
+
+    // 缓存bg options， 用于重置；
+    if(!image){
+        bg = this.data.bgConfig;
     }else{
         bg.image = image;
-        this.bgConfig = bg;
+        this.data.bgConfig = bg;
     }
+
     this.queue.push(() => {
-        if(bg.color){
-            this.ctx.fillStyle = bg.color;
-            this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
-        }
-        if(bg.image){
-            _.getImage(bg.image, img =>{
-                this._background(img,bg);
-            });
-        }else{
-            console.error('mcanvas error : background image error!');
-        }
+        if(bg.color)this.setBgColor(bg.color);
+        _.getImage(bg.image, img =>{
+            this._background(img, bg);
+        },this.fn.error);
     });
     return this;
+};
+
+// 设置画布颜色;
+MCanvas.prototype.setBgColor = function(color){
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
 };
 
 MCanvas.prototype._getBgAlign = function(left,iw,cw,cropScale){
@@ -93,8 +97,8 @@ MCanvas.prototype._getBgAlign = function(left,iw,cw,cropScale){
     }
     return rv;
 };
-MCanvas.prototype._background = function(img,bg){
-    let {iw,ih} = this._getSize(img);
+MCanvas.prototype._background = function(img, bg){
+    let { iw, ih } = this._getSize(img);
     // 图片与canvas的长宽比；
     let iRatio = iw / ih;
     let cRatio = this.canvas.width / this.canvas.height;
@@ -160,8 +164,54 @@ MCanvas.prototype._background = function(img,bg){
 // 绘制图层部分；
 // --------------------------------------------------------
 
+// 绘制矩形层；
+MCanvas.prototype.rect = function(ops){
+    this.queue.push(() => {
+        let { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0} = ops;
+        let cw = this.canvas.width , ch = this.canvas.height;
+        let width = this._get(cw, 0, ops.width || 0, 'pos') - 2 * strokeWidth,
+            height = this._get(ch, 0, ops.height || 0, 'pos') - 2 * strokeWidth;
+        let x = this._get(cw, width, ops.x || 0 ,'pos') + strokeWidth / 2,
+            y = this._get(ch, height, ops.y || 0 ,'pos') + strokeWidth / 2;
+        this.ctx.lineWidth = strokeWidth;
+        this.ctx.fillStyle = fillColor;
+        this.ctx.strokeStyle = strokeColor;
+
+        this.ctx.beginPath();
+        this.ctx.strokeRect(x, y, width, height);
+        this.ctx.fillRect(x, y, width, height);
+        this.ctx.closePath();
+
+        this._next();
+    });
+    return this;
+};
+
+// 绘制圆形层；
+MCanvas.prototype.circle = function(ops){
+    this.queue.push(() => {
+        let { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops;
+        let cw = this.canvas.width , ch = this.canvas.height;
+        let r = this._get(cw, 0, ops.r || 0, 'pos') - 2 * strokeWidth;
+        let x = this._get(cw, 2 * r, ops.x || 0 ,'pos') + strokeWidth / 2 + r,
+            y = this._get(ch, 2 * r, ops.y || 0 ,'pos') + strokeWidth / 2 + r;
+
+        this.ctx.beginPath();
+        this.ctx.arc(x,y,r,0,Math.PI*2,false);
+        this.ctx.fillStyle = fillColor;
+        this.ctx.fill();
+        this.ctx.strokeStyle = strokeColor;
+        this.ctx.lineWidth = strokeWidth;
+        this.ctx.stroke();
+        this.ctx.closePath();
+
+        this._next();
+    });
+    return this;
+};
+
 // 绘制水印；基于 add 函数封装；
-MCanvas.prototype.watermark = function(image = '',ops){
+MCanvas.prototype.watermark = function(image = '', ops){
     if(!image){
         console.error('mcanvas error : there is not image of watermark.');
         return;
@@ -230,7 +280,7 @@ MCanvas.prototype.add = function(image = '',options){
         this.queue.push(() => {
             _.getImage(v.image, img => {
                 this._add(img,this._handleOps(_.extend(def,v.options),img));
-            });
+            },this.fn.error);
         });
     });
 
@@ -238,13 +288,13 @@ MCanvas.prototype.add = function(image = '',options){
 };
 
 MCanvas.prototype._add = function(img,ops){
-    if(ops.width==0)console.warn(`mcanvas warn: the width of mc-element is zero`);
-    let {iw,ih} = this._getSize(img);
+    if(ops.width == 0)console.warn(`mcanvas warn: the width of mc-element is zero`);
+    let { iw, ih } = this._getSize(img);
     // let ratio = iw / ih;
     // 画布canvas参数；
     let cdx,cdy,cdw,cdh;
     // 素材canvas参数；
-    let { x:lsx, y:lsy, width:lsw, height:lsh} = ops.crop;
+    let { x:lsx, y:lsy, width:lsw, height:lsh } = ops.crop;
 
     let cratio = lsw / lsh;
     let ldx,ldy,ldw,ldh;
@@ -253,7 +303,7 @@ MCanvas.prototype._add = function(img,ops){
     let lctx = lcvs.getContext('2d');
     // 图片宽高比 * 1.4 是一个最安全的宽度，旋转任意角度都不会被裁剪；
     // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此甚至了最高倍数为5；
-    // _ratio 为 较大边 / 较小编 的比例；
+    // _ratio 为 较大边 / 较小边 的比例；
     let _ratio = iw > ih ? iw / ih : ih / iw;
     let lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4;
     let spaceX,spaceY;
@@ -285,7 +335,7 @@ MCanvas.prototype._add = function(img,ops){
 
     // 获取素材最终的宽高;
     if(shrink){
-        [lcvs.width,lcvs.height,ldx,ldy,ldw,ldh] = [lcvs.width,lcvs.height,ldx,ldy,ldw,ldh].map( v => Math.round(v*shrink));
+        [lcvs.width,lcvs.height,ldx,ldy,ldw,ldh] = [lcvs.width,lcvs.height,ldx,ldy,ldw,ldh].map(v => Math.round(v*shrink));
     }
 
     lctx.translate(lcvs.width/2,lcvs.height/2);
@@ -318,8 +368,7 @@ MCanvas.prototype._add = function(img,ops){
 
 // 获取宽高，兼容img，canvas
 MCanvas.prototype._getSize = function(img){
-    let iw,
-        ih;
+    let iw, ih;
     if(img.tagName === 'IMG'){
         iw = img.naturalWidth;
         ih = img.naturalHeight;
@@ -330,13 +379,13 @@ MCanvas.prototype._getSize = function(img){
         iw = img.offsetWidth;
         ih = img.offsetHeight;
     }
-    return{iw,ih};
+    return { iw, ih };
 };
 // 参数加工函数；
 MCanvas.prototype._handleOps = function(ops,img){
     let cw = this.canvas.width,
         ch = this.canvas.height;
-    let {iw,ih} = this._getSize(img);
+    let { iw, ih } = this._getSize(img);
 
     // 图片宽高比；
     let ratio = iw / ih;
@@ -384,23 +433,35 @@ MCanvas.prototype.text = function(context = '', ops){
     let size = this.canvas.width / 20;
 
     this.queue.push(()=>{
+        let defaultStyle = {
+            color:'#000',
+            type : 'fill',   // strokeText or fillText,
+            lineWidth : 1,
+            shadow:{
+                color: null,
+                blur: 0,
+                offsetX: 0,
+                offsetY: 0,
+            },
+        };
         let option = {
             width : 300,
             align : 'left',
             smallStyle:{
                 font : `${size * 0.8}px ${fontFamily}`,
-                color:'#000',
-                lineheight:size * 0.9,
+                lineHeight:size * 0.9,
+                ..._.deepCopy(defaultStyle),
             },
             normalStyle:{
                 font : `${size }px ${fontFamily}`,
-                color:'#000',
-                lineheight:size*1.1,
+                lineHeight:size*1.1,
+                type : 'fill',   // strokeText or fillText,
+                ..._.deepCopy(defaultStyle),
             },
             largeStyle:{
                 font : `${size * 1.3}px ${fontFamily}`,
-                color:'#000',
-                lineheight:size * 1.4,
+                lineHeight:size * 1.4,
+                ..._.deepCopy(defaultStyle),
             },
             pos:{
                 x:0,
@@ -449,13 +510,13 @@ MCanvas.prototype._text = function(textArr,option){
     option.width = this._get(this.canvas.width,0,option.width,'pos');
 
     let style,line = 1,length = 0,
-        lineheight = getLineHeight(textArr,option),
+        lineHeight = getLineHeight(textArr,option),
         x = this._get(this.canvas.width,option.width,option.pos.x,'pos'),
-        y = (this._get(this.canvas.height,0,option.pos.y,'pos')) + lineheight;
+        y = (this._get(this.canvas.height,0,option.pos.y,'pos')) + lineHeight;
 
     // data:字体数据；
     // lineWidth:行宽；
-    this.textData[line] = {
+    this.data.text[line] = {
         data:[],
         lineWidth:0,
     };
@@ -479,33 +540,33 @@ MCanvas.prototype._text = function(textArr,option){
                 if((length + width) > option.width || font == '|'){
                     length = 0;
                     x = this._get(this.canvas.width,option.width,option.pos.x,'pos');
-                    y += lineheight;
+                    y += lineHeight;
                     line += 1;
-                    this.textData[line] = {
+                    this.data.text[line] = {
                         data:[],
                         lineWidth:0,
                     };
                     if(font == '|')continue;
                 }
-                this.textData[line]['data'].push({
+                this.data.text[line]['data'].push({
                     context:font,x,y,style,width,
                 });
                 length += width;
                 x += width;
-                this.textData[line]['lineWidth'] = length;
+                this.data.text[line]['lineWidth'] = length;
             }
         }else{
-            this.textData[line]['data'].push({
+            this.data.text[line]['data'].push({
                 context,x,y,style,width,
             });
             length += width;
             x += width;
-            this.textData[line]['lineWidth'] = length;
+            this.data.text[line]['lineWidth'] = length;
         }
     });
 
     // 通过字体数据进行文字的绘制；
-    _.forin(this.textData,(k,v)=>{
+    _.forin(this.data.text,(k,v)=>{
         // 增加 align 的功能；
         let add = 0;
         if(v.lineWidth < option.width){
@@ -525,19 +586,51 @@ MCanvas.prototype._text = function(textArr,option){
     function getLineHeight(textArr,option) {
         let lh = 0,vlh;
         textArr.forEach( v =>{
-            vlh = option[`${v.type}Style`].lineheight;
+            vlh = option[`${v.type}Style`].lineHeight;
             if(vlh > lh)lh = vlh;
         });
         return lh;
     }
 };
 MCanvas.prototype._fillText = function(text){
-    let {context,x,y,style} = text;
+    let {context, x, y, style} = text;
     this.ctx.font = style.font;
     this.ctx.textAlign = style.align;
-    this.ctx.textBaseline = 'bottom';
-    this.ctx.fillStyle = style.color;
-    this.ctx.fillText(context,x,y);
+    this.ctx.textBaseline = 'alphabetic';
+    this.ctx.lineWidth = style.lineWidth;
+    this.ctx.shadowColor = style.shadow.color;
+    this.ctx.shadowBlur = style.shadow.blur;
+    this.ctx.shadowOffsetX = style.shadow.offsetX;
+    this.ctx.shadowOffsetY = style.shadow.offsetY;
+
+    if(style.gradient){
+        let { type, colorStop } = style.gradient;
+        let x1, y1, x2, y2;
+        if(type == 1){
+            x1 = x; y1 = y;
+            x2 = x + text.width; y2 = y ;
+        }else{
+            x1 = x; y1 = y - style.lineHeight;
+            x2 = x; y2 = y;
+        }
+        let grad  = this.ctx.createLinearGradient(x1,y1,x2,y2);
+        let colorNum = colorStop.length || 0;
+        _.forin(colorStop, (i, v)=>{
+            grad.addColorStop(1/colorNum*(+i+1),v);
+        });
+        this.ctx[`${style.type}Style`] = grad;
+    }else{
+        this.ctx[`${style.type}Style`] = style.color;
+    }
+
+    this.ctx[`${style.type}Text`](context,x,y);
+
+    this.ctx[`${style.type}Style`] = null;
+    this.ctx.lineWidth = 0;
+    this.ctx.shadowColor = null;
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
 };
 
 // --------------------------------------------------------
@@ -583,22 +676,23 @@ MCanvas.prototype._get = function(par,child,str,type){
 
 // 绘制函数；
 MCanvas.prototype.draw = function(ops){
-    let b64;
     let _ops = {
         type:'png',
         quality:.9,
-        callback(){},
-    };
+        success(){},
+        error(){},
+    }, b64;
     if(typeof ops == 'function'){
-        _ops.callback = ops;
+        _ops.success = ops;
     }else{
         _ops = _.extend(_ops,ops);
         if(_ops.type == 'jpg')_ops.type = 'jpeg';
     }
-    this.end = () => {
+    this.fn.error = _ops.error;
+    this.fn.success = () => {
         setTimeout(()=>{
             b64 = this.canvas.toDataURL(`image/${_ops.type}`, _ops.quality);
-            _ops.callback(b64);
+            _ops.success(b64);
         },0);
     };
     this._next();
@@ -608,7 +702,7 @@ MCanvas.prototype._next = function(){
     if(this.queue.length > 0){
         this.queue.shift()();
     }else{
-        this.end();
+        this.fn.success();
     }
 };
 

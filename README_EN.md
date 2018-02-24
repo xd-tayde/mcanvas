@@ -1,29 +1,29 @@
 # Document
 
-## create instance
+## Create Instance
 
-#### `new MCanvas(width,height,backgroundColor)` || `MCanvas(width,height,backgroundColor)`:
+#### `new MCanvas(options)` || `MCanvas(options)`:
 
-create the canvas by width and height;
+create the canvas;
 
 params:
 
-	// the width of origin canvas;
-	width : type : Number;
-			 Default : 500;
-			 required;
+- {Object} options
+	- {Number} width;
+	- {Number} height;
+	- {Color} backgroundColor;
 
-	// the height of origin canvas;
-	height: type : Number;
-			Default : width;
-			optional;
+用法: 
 
-	// the background-color of origin canvas;
-	backgroundColor: type : color;
-			Default : undefined;
-			optional;
+```js
+MCanvas({
+	width : 500, 
+	height: 500,
+	backgroundColor: '#fff',
+})
+```
 
-## method
+## API
 
 #### 1、 `mc.background(image,options)`:
 
@@ -33,14 +33,14 @@ options: optional ，default: init-bg；
 
 > if you use `mc.background(bg)` before , then you can use `mc.background()` to reset to the init background.
 
-params:
+usage:
 
 ```js
+
 // background-image,
 // type: url/HTMLImageElement/HTMLCanvasElement
-image:'' ,
+mc.background(image,{
 
-options : {
     // type: origin / crop / contain
     	// origin : the width and height of canvas will be same as the image naturalWidth and naturalHeight, the init width and height will be invalid;
     	// crop : the image will covered with the canvas, can control crop by left and top;
@@ -48,22 +48,21 @@ options : {
     type:'origin',
 
     // the distance of leftTop corner of canvas;
-	// can use 0% / 50% / 100% to crop by left / center / right;
+    // 100 / '100%' / '100px'	
+    // can use 0% / 50% / 100% to crop by left / center / right;
     left:'50%',
     top:0,
 
     // the background-color of canvas;
     color:'#000000',
-}
+})
 ```
-
-> TIPS：`background()` can use without `draw()`;
 
 #### 2、`add(image,options)`/`add([{image:'',options:{}},{image:'',options:{}}])`:
 
 prepare the source to draw on canvas;
 
-params:
+usage:
 
 ```js
 // source，type: url/HTMLImageElement/HTMLCanvasElement
@@ -139,7 +138,8 @@ params:
 
 ```js
 // context，there provide 3 style of large/normal/small;
-	// <b></b> : largeStyle  |  <s>小字</s> : smallStyle |  <br>
+	// <b></b> : largeStyle  |  <s>small</s> : smallStyle |  <br>
+	
 context : '<b>big</b>normal<br><s>small</s>',
 
 options:{
@@ -151,33 +151,38 @@ options:{
     // 'left'/'center'/'right';
     align : 'left',
 
-    // the default normal font-size is 5% of the width of canvas;
-    // smallStyle is 0.9 on normal;
-    // largeStyle is 1.2 on normal;
-    // default font-family is helvetica neue,hiragino sans gb,Microsoft YaHei,arial,tahoma,sans-serif;
-    // default color is black;
-    // lineheight is 1.1 on largeStyle;
-
-	 // and you can set the style;
-    // the style of contained in <s></s>
+	 // and you can set the style of text use smallStyle / normalStyle / largeStyle;
+	 
+	 // for example
+	 // the style of contained in <s></s>
     smallStyle:{
+    // font style same as css font, such as font-family/font-size...
         font : ``,
+        
+        // font color
         color:'#000',
+        
         lineheight: 100,
-    },
-
-    // the style of normal font
-    normalStyle:{
-        font : ``,
-        color:'#000',
-        lineheight: 100,
-    },
-
-    // the style of contained in <b></b>
-    largeStyle:{
-        font : '',
-        color:'#000',
-        lineheight: 100,
+        
+         // type of text
+        type: 'fill' | 'stroke',
+        
+        // the width of text's stroke;
+        lineWidth: 1,
+        
+        // shadow of text
+        shadow:{
+            color: null,
+            blur: 0,
+            offsetX: 0,
+            offsetY: 0,
+        },
+        
+        // gradient of text
+        gradient:{
+	        type: 2,  // [1,2]
+	        colorStop: ['red','blue'],
+	     },
     },
 
     // the position of text on canvas;
@@ -189,7 +194,50 @@ options:{
     },
 };
 ```
-#### 5、 `draw(fn)`:
+
+#### 5、`mc.rect(ops)`
+
+draw a rectangle；
+
+```js
+ops: {
+	// x: 250 / '250px' / '100%' / 'left:250' / 'center',
+	x: 0,
+	y: 0,
+	
+	width: '100%',
+	height: '100%',
+	
+	strokeWidth : 1,
+
+	strokeColor: '#fff',
+	
+	fillColor: '#fff',
+}
+```
+
+#### 6、`mc.circle(ops)`
+
+draw a circle;
+
+```js
+ops: {
+	// x: 250 / '250px' / '100%' / 'left:250' / 'center',
+	x: 0,
+	y: 0,
+	
+	// radius : 100 / '100%' / '100px'
+	r: 100,
+	
+	strokeWidth : 1,
+	
+	strokeColor: '#fff',
+
+	fillColor: '#fff',
+}
+```
+
+#### 7、 `draw(fn)`:
 
 final function ，`add`/`watermark`/`text` must use the `draw()` on the end, and it will export a base64 image that you can use in callback;
 
@@ -205,8 +253,13 @@ mc.draw({
 	//  it's invalid to png type;
     // default: .9;
     quality: 1,
-    callback(b64){
+    
+    success(b64){
         console.log(b64);
+    }
+    
+    error(err){
+    	console.log(err);
     }
 })
 ```

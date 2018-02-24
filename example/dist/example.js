@@ -8,17 +8,27 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _ = {
     extend: function extend(obj1, obj2) {
-        for (var k in obj2) {
-            if (obj2.hasOwnProperty(k)) {
-                if (_typeof(obj2[k]) == 'object') {
-                    if (_typeof(obj1[k]) !== 'object' || obj1[k] === null) {
-                        obj1[k] = {};
-                    }
-                    this.extend(obj1[k], obj2[k]);
+        var _this = this;
+
+        var type = this.isType(obj2);
+        if (type == 'object') {
+            this.forin(obj2, function (k, v) {
+                var vType = _this.isType(v);
+                if (vType !== 'object' && vType !== 'array') {
+                    obj1[k] = v;
                 } else {
-                    obj1[k] = obj2[k];
+                    if (_this.isType(obj1[k]) !== vType || obj1[k] === null) {
+                        obj1[k] = vType == 'object' ? {} : [];
+                    }
+                    _this.extend(obj1[k], v);
                 }
+            });
+        } else if (type == 'array') {
+            for (var i = 0; i < obj2.length; i++) {
+                obj1[i] = obj2[i];
             }
+        } else {
+            obj1 = obj2;
         }
         return obj1;
     },
@@ -29,22 +39,29 @@ var _ = {
         }
         img.onload = function () {
             loaded(img);
+            setTimeout(function () {
+                img = null;
+            }, 10);
         };
         img.onerror = function () {
             error('img load error');
         };
         img.src = image;
     },
-    isArr: function isArr(arr) {
-        return Object.prototype.toString.call(arr) === '[object Array]';
+    isObject: function isObject(tar) {
+        return this.isObjFunc(tar, 'Object');
     },
-    getImage: function getImage(image, cbk) {
+    isBoolean: function isBoolean(tar) {
+        return this.isObjFunc(tar, 'Boolean');
+    },
+    isArr: function isArr(tar) {
+        return this.isObjFunc(tar, 'Array');
+    },
+    getImage: function getImage(image, cbk, error) {
         if (typeof image == 'string') {
             this.loadImage(image, function (img) {
                 cbk(img);
-            }, function (err) {
-                console.log(err);
-            });
+            }, error);
         } else if ((typeof image === 'undefined' ? 'undefined' : _typeof(image)) == 'object') {
             cbk(image);
         } else {
@@ -68,38 +85,54 @@ var _ = {
         } else {
             return false;
         }
+    },
+    deepCopy: function deepCopy(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    },
+    isObjFunc: function isObjFunc(tar, name) {
+        return Object.prototype.toString.call(tar) === '[object ' + name + ']';
+    },
+    isType: function isType(tar) {
+        return Object.prototype.toString.call(tar).split(' ')[1].replace(']', '').toLowerCase();
     }
 };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-function MCanvas(cwidth, cheight, backgroundColor) {
-
+function MCanvas(options) {
     // 兼容不使用 new 的方式；
-    if (!(this instanceof MCanvas)) return new MCanvas(cwidth, cheight, backgroundColor);
+    if (!(this instanceof MCanvas)) return new MCanvas(options);
 
     // 配置canvas初始大小；
-    // cwidth：画布宽度，Number,选填，默认为 500;
-    // cheight: 画布高度，Number，选填，默认与宽度一致；
-    this.ops = {
-        width: cwidth || 500,
-        height: cheight || cwidth,
-        backgroundColor: backgroundColor
-    };
+    // width：画布宽度，Number,选填，默认为 500;
+    // height: 画布高度，Number，选填，默认与宽度一致；
+    this.ops = _.extend({
+        width: 500,
+        height: 500,
+        backgroundColor: ''
+    }, options);
+
     // 全局画布；
     this.canvas = null;
     this.ctx = null;
-
     // 绘制函数队列；
     this.queue = [];
-    // 最后执行的函数；
-    this.end = null;
+    // 回调函数池；
+    this.fn = {
+        // 最后执行的函数；
+        success: function success() {},
 
-    // 文字绘制数据；
-    this.textData = {};
-
-    // 背景图数据;
-    this.bgConfig = null;
+        // 错误回调；
+        error: function error() {}
+    };
+    this.data = {
+        // 文字绘制数据；
+        text: {},
+        // 背景图数据;
+        bgConfig: null
+    };
 
     // 初始化创建画布；
     this._init();
@@ -110,44 +143,47 @@ MCanvas.prototype._init = function () {
     this.canvas.width = this.ops.width;
     this.canvas.height = this.ops.height;
     this.ctx = this.canvas.getContext('2d');
-    if (this.ops.backgroundColor) {
-        this.ctx.fillStyle = this.ops.backgroundColor;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    }
+
+    this.ops.backgroundColor && this.setBgColor(this.ops.backgroundColor);
 };
 
 // --------------------------------------------------------
 // 绘制背景部分；
 // --------------------------------------------------------
 
-MCanvas.prototype.background = function (image, bg) {
+MCanvas.prototype.background = function (image) {
     var _this = this;
 
-    if (!bg && !image) {
-        if (this.bgConfig) {
-            bg = this.bgConfig;
-        } else {
-            console.error('mcanvas error : the init background must has the bg option params.');
-            return;
-        }
+    var bg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        type: 'origin'
+    };
+
+    if (!image && !this.data.bgConfig) {
+        console.error('mcanvas error : the init background must has a image.');
+        return;
+    }
+
+    // 缓存bg options， 用于重置；
+    if (!image) {
+        bg = this.data.bgConfig;
     } else {
         bg.image = image;
-        this.bgConfig = bg;
+        this.data.bgConfig = bg;
     }
+
     this.queue.push(function () {
-        if (bg.color) {
-            _this.ctx.fillStyle = bg.color;
-            _this.ctx.fillRect(0, 0, _this.canvas.width, _this.canvas.height);
-        }
-        if (bg.image) {
-            _.getImage(bg.image, function (img) {
-                _this._background(img, bg);
-            });
-        } else {
-            console.error('mcanvas error : background image error!');
-        }
+        if (bg.color) _this.setBgColor(bg.color);
+        _.getImage(bg.image, function (img) {
+            _this._background(img, bg);
+        }, _this.fn.error);
     });
     return this;
+};
+
+// 设置画布颜色;
+MCanvas.prototype.setBgColor = function (color) {
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
 MCanvas.prototype._getBgAlign = function (left, iw, cw, cropScale) {
@@ -245,6 +281,70 @@ MCanvas.prototype._background = function (img, bg) {
 // 绘制图层部分；
 // --------------------------------------------------------
 
+// 绘制矩形层；
+MCanvas.prototype.rect = function (ops) {
+    var _this2 = this;
+
+    this.queue.push(function () {
+        var _ops$fillColor = ops.fillColor,
+            fillColor = _ops$fillColor === undefined ? '#fff' : _ops$fillColor,
+            _ops$strokeColor = ops.strokeColor,
+            strokeColor = _ops$strokeColor === undefined ? fillColor : _ops$strokeColor,
+            _ops$strokeWidth = ops.strokeWidth,
+            strokeWidth = _ops$strokeWidth === undefined ? 0 : _ops$strokeWidth;
+
+        var cw = _this2.canvas.width,
+            ch = _this2.canvas.height;
+        var width = _this2._get(cw, 0, ops.width || 0, 'pos') - 2 * strokeWidth,
+            height = _this2._get(ch, 0, ops.height || 0, 'pos') - 2 * strokeWidth;
+        var x = _this2._get(cw, width, ops.x || 0, 'pos') + strokeWidth / 2,
+            y = _this2._get(ch, height, ops.y || 0, 'pos') + strokeWidth / 2;
+        _this2.ctx.lineWidth = strokeWidth;
+        _this2.ctx.fillStyle = fillColor;
+        _this2.ctx.strokeStyle = strokeColor;
+
+        _this2.ctx.beginPath();
+        _this2.ctx.strokeRect(x, y, width, height);
+        _this2.ctx.fillRect(x, y, width, height);
+        _this2.ctx.closePath();
+
+        _this2._next();
+    });
+    return this;
+};
+
+// 绘制圆形层；
+MCanvas.prototype.circle = function (ops) {
+    var _this3 = this;
+
+    this.queue.push(function () {
+        var _ops$fillColor2 = ops.fillColor,
+            fillColor = _ops$fillColor2 === undefined ? '#fff' : _ops$fillColor2,
+            _ops$strokeColor2 = ops.strokeColor,
+            strokeColor = _ops$strokeColor2 === undefined ? fillColor : _ops$strokeColor2,
+            _ops$strokeWidth2 = ops.strokeWidth,
+            strokeWidth = _ops$strokeWidth2 === undefined ? 0 : _ops$strokeWidth2;
+
+        var cw = _this3.canvas.width,
+            ch = _this3.canvas.height;
+        var r = _this3._get(cw, 0, ops.r || 0, 'pos') - 2 * strokeWidth;
+        var x = _this3._get(cw, 2 * r, ops.x || 0, 'pos') + strokeWidth / 2 + r,
+            y = _this3._get(ch, 2 * r, ops.y || 0, 'pos') + strokeWidth / 2 + r;
+
+        _this3.ctx.beginPath();
+        _this3.ctx.arc(x, y, r, 0, Math.PI * 2, false);
+        _this3.ctx.fillStyle = fillColor;
+        _this3.ctx.fill();
+        _this3.ctx.strokeStyle = strokeColor;
+        _this3.ctx.lineWidth = strokeWidth;
+        _this3.ctx.stroke();
+        _this3.ctx.closePath();
+
+        _this3._next();
+    });
+    return this;
+};
+
 // 绘制水印；基于 add 函数封装；
 MCanvas.prototype.watermark = function () {
     var image = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -299,7 +399,7 @@ MCanvas.prototype.watermark = function () {
 // 多张图: add([{image:'',options:{}},{image:'',options:{}}]);
 // 单张图: add(image,options);
 MCanvas.prototype.add = function () {
-    var _this2 = this;
+    var _this4 = this;
 
     var image = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     var options = arguments[1];
@@ -326,10 +426,10 @@ MCanvas.prototype.add = function () {
     image.forEach(function (v) {
         // 将封装好的 add函数 推入队列中待执行；
         // 参数经过 _handleOps 加工；
-        _this2.queue.push(function () {
+        _this4.queue.push(function () {
             _.getImage(v.image, function (img) {
-                _this2._add(img, _this2._handleOps(_.extend(def, v.options), img));
-            });
+                _this4._add(img, _this4._handleOps(_.extend(def, v.options), img));
+            }, _this4.fn.error);
         });
     });
 
@@ -368,7 +468,7 @@ MCanvas.prototype._add = function (img, ops) {
     var lctx = lcvs.getContext('2d');
     // 图片宽高比 * 1.4 是一个最安全的宽度，旋转任意角度都不会被裁剪；
     // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此甚至了最高倍数为5；
-    // _ratio 为 较大边 / 较小编 的比例；
+    // _ratio 为 较大边 / 较小边 的比例；
     var _ratio = iw > ih ? iw / ih : ih / iw;
     var lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4;
     var spaceX = void 0,
@@ -521,7 +621,7 @@ MCanvas.prototype._handleOps = function (ops, img) {
 // 绘制文字部分；
 // --------------------------------------------------------
 MCanvas.prototype.text = function () {
-    var _this3 = this;
+    var _this5 = this;
 
     var context = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     var ops = arguments[1];
@@ -532,24 +632,32 @@ MCanvas.prototype.text = function () {
     var size = this.canvas.width / 20;
 
     this.queue.push(function () {
+        var defaultStyle = {
+            color: '#000',
+            type: 'fill', // strokeText or fillText,
+            lineWidth: 1,
+            shadow: {
+                color: null,
+                blur: 0,
+                offsetX: 0,
+                offsetY: 0
+            }
+        };
         var option = {
             width: 300,
             align: 'left',
-            smallStyle: {
+            smallStyle: _extends({
                 font: size * 0.8 + 'px ' + fontFamily,
-                color: '#000',
-                lineheight: size * 0.9
-            },
-            normalStyle: {
+                lineHeight: size * 0.9
+            }, _.deepCopy(defaultStyle)),
+            normalStyle: _extends({
                 font: size + 'px ' + fontFamily,
-                color: '#000',
-                lineheight: size * 1.1
-            },
-            largeStyle: {
+                lineHeight: size * 1.1,
+                type: 'fill' }, _.deepCopy(defaultStyle)),
+            largeStyle: _extends({
                 font: size * 1.3 + 'px ' + fontFamily,
-                color: '#000',
-                lineheight: size * 1.4
-            },
+                lineHeight: size * 1.4
+            }, _.deepCopy(defaultStyle)),
             pos: {
                 x: 0,
                 y: 0
@@ -558,8 +666,8 @@ MCanvas.prototype.text = function () {
         option = _.extend(option, ops);
 
         // 解析字符串模板后，调用字体绘制函数；
-        _this3._text(_this3._parse(context), option);
-        _this3._next();
+        _this5._text(_this5._parse(context), option);
+        _this5._next();
     });
     return this;
 };
@@ -593,7 +701,7 @@ MCanvas.prototype._parse = function (context) {
 };
 
 MCanvas.prototype._text = function (textArr, option) {
-    var _this4 = this;
+    var _this6 = this;
 
     // 处理宽度参数；
     option.width = this._get(this.canvas.width, 0, option.width, 'pos');
@@ -601,13 +709,13 @@ MCanvas.prototype._text = function (textArr, option) {
     var style = void 0,
         line = 1,
         length = 0,
-        lineheight = getLineHeight(textArr, option),
+        lineHeight = getLineHeight(textArr, option),
         x = this._get(this.canvas.width, option.width, option.pos.x, 'pos'),
-        y = this._get(this.canvas.height, 0, option.pos.y, 'pos') + lineheight;
+        y = this._get(this.canvas.height, 0, option.pos.y, 'pos') + lineHeight;
 
     // data:字体数据；
     // lineWidth:行宽；
-    this.textData[line] = {
+    this.data.text[line] = {
         data: [],
         lineWidth: 0
     };
@@ -615,8 +723,8 @@ MCanvas.prototype._text = function (textArr, option) {
     // 生成字体数据；
     textArr.forEach(function (v) {
         style = option[v.type + 'Style'];
-        _this4.ctx.font = style.font;
-        var width = _this4.ctx.measureText(v.text).width;
+        _this6.ctx.font = style.font;
+        var width = _this6.ctx.measureText(v.text).width;
 
         // 处理 <br> 换行，先替换成 '|',便于单字绘图时进行判断；
         var context = v.text.replace(/<br>/g, '|');
@@ -625,39 +733,39 @@ MCanvas.prototype._text = function (textArr, option) {
         if (length + width > option.width || context.indexOf('|') !== -1) {
             for (var i = 0, fontLength = context.length; i < fontLength; i++) {
                 var font = context[i];
-                width = _this4.ctx.measureText(font).width;
+                width = _this6.ctx.measureText(font).width;
 
                 // 当字体的计算宽度 > 设置的宽度 || 内容中包含换行时,进入换行逻辑；
                 if (length + width > option.width || font == '|') {
                     length = 0;
-                    x = _this4._get(_this4.canvas.width, option.width, option.pos.x, 'pos');
-                    y += lineheight;
+                    x = _this6._get(_this6.canvas.width, option.width, option.pos.x, 'pos');
+                    y += lineHeight;
                     line += 1;
-                    _this4.textData[line] = {
+                    _this6.data.text[line] = {
                         data: [],
                         lineWidth: 0
                     };
                     if (font == '|') continue;
                 }
-                _this4.textData[line]['data'].push({
+                _this6.data.text[line]['data'].push({
                     context: font, x: x, y: y, style: style, width: width
                 });
                 length += width;
                 x += width;
-                _this4.textData[line]['lineWidth'] = length;
+                _this6.data.text[line]['lineWidth'] = length;
             }
         } else {
-            _this4.textData[line]['data'].push({
+            _this6.data.text[line]['data'].push({
                 context: context, x: x, y: y, style: style, width: width
             });
             length += width;
             x += width;
-            _this4.textData[line]['lineWidth'] = length;
+            _this6.data.text[line]['lineWidth'] = length;
         }
     });
 
     // 通过字体数据进行文字的绘制；
-    _.forin(this.textData, function (k, v) {
+    _.forin(this.data.text, function (k, v) {
         // 增加 align 的功能；
         var add = 0;
         if (v.lineWidth < option.width) {
@@ -669,7 +777,7 @@ MCanvas.prototype._text = function (textArr, option) {
         }
         v.data.forEach(function (text) {
             text.x += add;
-            _this4._fillText(text);
+            _this6._fillText(text);
         });
     });
 
@@ -678,7 +786,7 @@ MCanvas.prototype._text = function (textArr, option) {
         var lh = 0,
             vlh = void 0;
         textArr.forEach(function (v) {
-            vlh = option[v.type + 'Style'].lineheight;
+            vlh = option[v.type + 'Style'].lineHeight;
             if (vlh > lh) lh = vlh;
         });
         return lh;
@@ -692,9 +800,47 @@ MCanvas.prototype._fillText = function (text) {
 
     this.ctx.font = style.font;
     this.ctx.textAlign = style.align;
-    this.ctx.textBaseline = 'bottom';
-    this.ctx.fillStyle = style.color;
-    this.ctx.fillText(context, x, y);
+    this.ctx.textBaseline = 'alphabetic';
+    this.ctx.lineWidth = style.lineWidth;
+    this.ctx.shadowColor = style.shadow.color;
+    this.ctx.shadowBlur = style.shadow.blur;
+    this.ctx.shadowOffsetX = style.shadow.offsetX;
+    this.ctx.shadowOffsetY = style.shadow.offsetY;
+
+    if (style.gradient) {
+        var _style$gradient = style.gradient,
+            type = _style$gradient.type,
+            colorStop = _style$gradient.colorStop;
+
+        var x1 = void 0,
+            y1 = void 0,
+            x2 = void 0,
+            y2 = void 0;
+        if (type == 1) {
+            x1 = x;y1 = y;
+            x2 = x + text.width;y2 = y;
+        } else {
+            x1 = x;y1 = y - style.lineHeight;
+            x2 = x;y2 = y;
+        }
+        var grad = this.ctx.createLinearGradient(x1, y1, x2, y2);
+        var colorNum = colorStop.length || 0;
+        _.forin(colorStop, function (i, v) {
+            grad.addColorStop(1 / colorNum * (+i + 1), v);
+        });
+        this.ctx[style.type + 'Style'] = grad;
+    } else {
+        this.ctx[style.type + 'Style'] = style.color;
+    }
+
+    this.ctx[style.type + 'Text'](context, x, y);
+
+    this.ctx[style.type + 'Style'] = null;
+    this.ctx.lineWidth = 0;
+    this.ctx.shadowColor = null;
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
 };
 
 // --------------------------------------------------------
@@ -740,24 +886,26 @@ MCanvas.prototype._get = function (par, child, str, type) {
 
 // 绘制函数；
 MCanvas.prototype.draw = function (ops) {
-    var _this5 = this;
+    var _this7 = this;
 
-    var b64 = void 0;
     var _ops = {
         type: 'png',
         quality: .9,
-        callback: function callback() {}
-    };
+        success: function success() {},
+        error: function error() {}
+    },
+        b64 = void 0;
     if (typeof ops == 'function') {
-        _ops.callback = ops;
+        _ops.success = ops;
     } else {
         _ops = _.extend(_ops, ops);
         if (_ops.type == 'jpg') _ops.type = 'jpeg';
     }
-    this.end = function () {
+    this.fn.error = _ops.error;
+    this.fn.success = function () {
         setTimeout(function () {
-            b64 = _this5.canvas.toDataURL('image/' + _ops.type, _ops.quality);
-            _ops.callback(b64);
+            b64 = _this7.canvas.toDataURL('image/' + _ops.type, _ops.quality);
+            _ops.success(b64);
         }, 0);
     };
     this._next();
@@ -767,7 +915,7 @@ MCanvas.prototype._next = function () {
     if (this.queue.length > 0) {
         this.queue.shift()();
     } else {
-        this.end();
+        this.fn.success();
     }
 };
 
@@ -804,29 +952,75 @@ var data = {
             pos: 'rightBottom'
         }
     },
+    addRectOps: {
+        x: 0,
+        y: 'bottom:0',
+        width: '100%',
+        height: 300,
+        strokeWidth: 5,
+        strokeColor: '#996699',
+        fillColor: 'rgba(0,0,0,.5)'
+    },
+    addCircleOps: {
+        x: 'center',
+        y: 'center',
+        r: 100,
+        strokeWidth: 5,
+        strokeColor: '#996699',
+        fillColor: 'rgba(0,0,0,.5)'
+    },
     addTextOps: {
-        text: '<b>美图</b>前端组啊啊啊啊<s>MCanvas.js</s>',
+        // text:'<b>A</b>BBBBB<s>MCanvas.js</s>',
+        text: '<b>Large/Stroke</b><br>Normal/Gradient<br><s>Small/Shadow</s>',
         options: {
-            width: '200',
-            align: 'left',
+            width: '600',
+            align: 'center',
             largeStyle: {
-                color: 'red'
+                color: 'red',
+                font: '80px Microsoft YaHei,sans-serif',
+                type: 'stroke',
+                lineWidth: 2,
+                lineHeight: 100
             },
             normalStyle: {
-                color: 'blue'
+                color: 'blue',
+                font: '70px Microsoft YaHei,sans-serif',
+                // lineHeight : 100,
+                // shadow:{
+                //     color: 'red',
+                //     blur: 4,
+                //     offsetX: 2,
+                //     offsetY: 2,
+                // },
+                gradient: {
+                    type: 2, // 1: 横向渐变； 2: 纵向渐变；
+                    colorStop: ['red', 'blue']
+                }
             },
             smallStyle: {
-                color: 'yellow'
+                color: 'yellow',
+                font: '60px Microsoft YaHei,sans-serif',
+                // lineHeight : 100,
+                shadow: {
+                    color: 'red',
+                    blur: 10,
+                    offsetX: 5,
+                    offsetY: 5
+                }
             },
             pos: {
                 x: 'center',
-                y: 'bottom:200'
+                y: 'bottom:400'
             }
         }
     }
 };
 
-var mc = new MCanvas(1000, 1500, 'black');
+var mc = new MCanvas({
+    width: 1000,
+    height: 1500
+    // backgroundColor: 'black',
+});
 mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
     // mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
     type: 'origin',
@@ -853,10 +1047,10 @@ $cancel.on('click', function () {
 });
 
 $clear.on('click', function () {
-    mc.clear();
-    // mc.background().clear().draw(b64=>{
-    //     $result.attr('src',b64);
-    // });
+    // mc.clear();
+    mc.background().clear().draw(function (b64) {
+        $result.attr('src', b64);
+    });
 });
 
 $('.js-addImage').on('click', function () {
@@ -874,6 +1068,14 @@ $('.js-addText').on('click', function () {
     showDialog(type, data.addTextOps);
 });
 
+$('.js-addRect').on('click', function () {
+    mcDraw(data.addRectOps, 'rect');
+});
+
+$('.js-addCircle').on('click', function () {
+    mcDraw(data.addCircleOps, 'circle');
+});
+
 $sure.on('click', function () {
     var ops = $(this).data('ops');
     var type = $(this).data('type');
@@ -881,17 +1083,21 @@ $sure.on('click', function () {
 });
 
 function mcDraw(ops, type) {
+    var img = void 0;
     switch (type) {
         case 'image':
-            var img = new Image();
+            img = new Image();
             img.crossOrigin = '*';
             img.onload = function () {
                 mc.add(img, ops.options).draw({
                     type: 'jpg',
                     quality: .9,
-                    callback: function callback(b64) {
+                    success: function success(b64) {
                         $result.attr('src', b64);
                         $dialog.hide();
+                    },
+                    error: function error(err) {
+                        console.log('error', err);
                     }
                 });
             };
@@ -909,8 +1115,19 @@ function mcDraw(ops, type) {
                 $dialog.hide();
             });
             break;
+        case 'rect':
+            mc.rect(ops).draw(function (b64) {
+                $result.attr('src', b64);
+                $dialog.hide();
+            });
+            break;
+        case 'circle':
+            mc.circle(ops).draw(function (b64) {
+                $result.attr('src', b64);
+                $dialog.hide();
+            });
+            break;
         default:
-
     }
 }
 
@@ -925,7 +1142,7 @@ function showDialog(type, ops) {
             html = '<li>image:\'' + ops.image + '\'</li>\n                    <li>options:{</li>\n                    <li>' + tab + 'width:<input data-type=\'width\' class=\'js-input input\' type=\'text\' value=\'' + ops.options.width + '\'></li>\n                    <li>' + tab + 'pos:\n                        <select data-type=\'pos\' class=\'js-select select\'>\n                            <option>rightBottom</option>\n                            <option>rightTop</option>\n                            <option>leftBottom</option>\n                            <option>leftTop</option>\n                        </select>\n                    <li>}</li>';
             break;
         case 'text':
-            html = '<li>text:<span style="font-size:12px;">\'\'&lt;b&gt;\u7F8E\u56FE&lt;/b&gt;\u524D\u7AEF\u7EC4\u554A\u554A\u554A\u554A&lt;s&gt;MCanvas.js&lt;/s&gt;\'\'</span></li>\n                    <li>options:{</li>\n                    <li>' + tab + 'width:<input data-type=\'width\' class=\'js-input input\' type=\'text\' value=\'' + ops.options.width + '\'></li>\n                    <li>' + tab + 'align:\n                        <select data-type=\'align\' class=\'js-select select\'>\n                            <option>left</option>\n                            <option>center</option>\n                            <option>right</option>\n                        </select>\n                    </li>\n                    <li>' + tab + 'pos:{\n                    <li>' + (tab + tab) + 'x:<input data-type=\'x\' class=\'js-input input\' type=\'text\' value=\'' + ops.options.pos.x + '\'></li>\n                    <li>' + (tab + tab) + 'y:<input data-type=\'y\' class=\'js-input input\' type=\'text\' value=\'' + ops.options.pos.y + '\'></li>\n                    <li>' + tab + '}</li>\n                    <li>}</li>';
+            html = '<li>text:<span style="font-size:12px;">\'\'&lt;b&gt;Large/Stroke&lt;/b&gt;Normal/Gradient&lt;s&gt;Small/Shadow&lt;/s&gt;\'\'</span></li>\n                    <li>options:{</li>\n                    <li>' + tab + 'width:<input data-type=\'width\' class=\'js-input input\' type=\'text\' value=\'' + ops.options.width + '\'></li>\n                    <li>' + tab + 'align:\n                        <select data-type=\'align\' class=\'js-select select\'>\n                            <option>left</option>\n                            <option>center</option>\n                            <option>right</option>\n                        </select>\n                    </li>\n                    <li>' + tab + 'pos:{\n                    <li>' + (tab + tab) + 'x:<input data-type=\'x\' class=\'js-input input\' type=\'text\' value=\'' + ops.options.pos.x + '\'></li>\n                    <li>' + (tab + tab) + 'y:<input data-type=\'y\' class=\'js-input input\' type=\'text\' value=\'' + ops.options.pos.y + '\'></li>\n                    <li>' + tab + '}</li>\n                    <li>}</li>';
             break;
         default:
     }

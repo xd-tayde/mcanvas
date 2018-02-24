@@ -1,16 +1,24 @@
 export default {
     extend(obj1, obj2) {
-        for (let k in obj2) {
-            if (obj2.hasOwnProperty(k)) {
-                if (typeof obj2[k] == 'object') {
-                    if (typeof obj1[k] !== 'object' || obj1[k] === null) {
-                        obj1[k] = {};
-                    }
-                    this.extend(obj1[k], obj2[k]);
+        let type = this.isType(obj2);
+        if(type == 'object'){
+            this.forin(obj2, (k,v) => {
+                let vType = this.isType(v);
+                if (vType !== 'object' && vType !== 'array') {
+                    obj1[k] = v;
                 } else {
-                    obj1[k] = obj2[k];
+                    if (this.isType(obj1[k]) !== vType || obj1[k] === null) {
+                        obj1[k] = vType == 'object' ? {} : [];
+                    }
+                    this.extend(obj1[k], v);
                 }
+            });
+        }else if(type == 'array'){
+            for (let i = 0; i < obj2.length; i++) {
+                obj1[i] = obj2[i];
             }
+        }else{
+            obj1 = obj2;
         }
         return obj1;
     },
@@ -21,22 +29,29 @@ export default {
         }
         img.onload = () => {
             loaded(img);
+            setTimeout(()=>{
+                img = null;
+            },10);
         };
         img.onerror = () => {
             error('img load error');
         };
         img.src = image;
     },
-    isArr(arr) {
-        return Object.prototype.toString.call(arr) === '[object Array]';
+    isObject(tar){
+        return this.isObjFunc(tar, 'Object');
     },
-    getImage(image,cbk){
+    isBoolean(tar){
+        return this.isObjFunc(tar, 'Boolean');
+    },
+    isArr(tar){
+        return this.isObjFunc(tar, 'Array');
+    },
+    getImage(image,cbk, error){
         if(typeof image == 'string'){
                 this.loadImage(image, img => {
                     cbk(img);
-                },err=>{
-                    console.log(err);
-                });
+                },error);
         }else if(typeof image == 'object'){
             cbk(image);
         }else{
@@ -60,5 +75,14 @@ export default {
         }else{
             return false;
         }
+    },
+    deepCopy(obj){
+        return JSON.parse(JSON.stringify(obj));
+    },
+    isObjFunc(tar, name) {
+        return Object.prototype.toString.call(tar) === '[object ' + name + ']';
+    },
+    isType(tar){
+        return Object.prototype.toString.call(tar).split(' ')[1].replace(']','').toLowerCase();
     },
 };

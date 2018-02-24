@@ -85,11 +85,10 @@ html,body{
     font-size: 14px;
     line-height: 35px;
     border-radius: 20px;
-    margin: 0 3px;
+    margin: 10px 3px;
 }
 
 .Button.clear{
-    margin-top: 20px;
     width: 150px;
     border-radius: 50px;
 }
@@ -103,6 +102,14 @@ html,body{
     font-size: 40px;
     line-height: 60px;
     margin-bottom: 10px;
+}
+.sub-title{
+    text-align: center;
+    color: #996699;
+    font-size: 20px;
+    line-height: 30px;
+    margin-bottom: 10px;
+    padding: 0 20px;
 }
 
 .dialog{
