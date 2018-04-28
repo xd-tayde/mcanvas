@@ -1,6 +1,6 @@
 import _ from './utils';
 
-export default function MCanvas(options){
+export default function MCanvas(options = {}){
     // 兼容不使用 new 的方式；
     if (!(this instanceof MCanvas))return new MCanvas(options);
 
@@ -26,6 +26,8 @@ export default function MCanvas(options){
         error(){},
     };
     this.data = {
+        // 文字id；
+        textId: 0,
         // 文字绘制数据；
         text : {},
         // 背景图数据;
@@ -353,7 +355,7 @@ MCanvas.prototype._add = function(img,ops){
 
     lctx.translate(lcvs.width/2,lcvs.height/2);
     lctx.rotate(ops.pos.rotate);
-
+    
     lctx.drawImage(img,lsx,lsy,lsw,lsh,ldx,ldy,ldw,ldh);
 
     // lcvs.style.width = '300px';
@@ -466,7 +468,7 @@ MCanvas.prototype.text = function(context = '', ops){
                 ..._.deepCopy(defaultStyle),
             },
             normalStyle:{
-                font : `${size }px ${fontFamily}`,
+                font : `${size}px ${fontFamily}`,
                 lineHeight:size*1.1,
                 type : 'fill',   // strokeText or fillText,
                 ..._.deepCopy(defaultStyle),
@@ -481,9 +483,22 @@ MCanvas.prototype.text = function(context = '', ops){
                 y:0,
             },
         };
+
         option = _.extend(option,ops);
 
         // 解析字符串模板后，调用字体绘制函数；
+        let parseContext = this._parse(context);
+        let max = 0, maxFont;
+        parseContext.map(v => {
+            if (v.size > max) {
+                max = v.size;
+                maxFont = v.type;
+            }
+        });
+        // 当设置的宽度小于字体宽度时，强行将设置宽度设为与字体一致；
+        let manFontSize = parseInt(option[`${maxFont}Style`].font);
+        if (manFontSize && option.width < manFontSize) option.width = manFontSize;
+
         this._text(this._parse(context),option);
         this._next();
     });
@@ -501,24 +516,32 @@ MCanvas.prototype._parse = function(context){
                 type     = /<\/s>/.test(value) ? 'small' : 'large';
             let tmp = arr[i].split(splitTag);
             result.push({
-                type:type,
+                type,
                 text:tmp[0],
+                // 用于字体的大小比较；
+                size: type == 'small' ? 0 : 2,
             });
             tmp[1] && result.push({
                 type:'normal',
                 text:tmp[1],
+                size: 1,
             });
             continue;
         }
         arr[i] && result.push({
             text:arr[i],
             type:'normal',
+            size: 1,
         });
     }
     return result;
 };
 
 MCanvas.prototype._text = function(textArr,option){
+    
+    this.data.textId++;
+    this.data.text[this.data.textId] = {};
+
     // 处理宽度参数；
     option.width = this._get(this.canvas.width,0,option.width,'pos');
 
@@ -529,7 +552,7 @@ MCanvas.prototype._text = function(textArr,option){
 
     // data:字体数据；
     // lineWidth:行宽；
-    this.data.text[line] = {
+    this.data.text[this.data.textId][line] = {
         data:[],
         lineWidth:0,
     };
@@ -545,7 +568,7 @@ MCanvas.prototype._text = function(textArr,option){
 
         // 先进行多字超出判断，超出宽度后再进行单字超出判断；
         if((length + width) > option.width || context.indexOf('|') !== -1){
-            for (let i=0,fontLength = context.length; i < fontLength; i++) {
+            for (let i = 0,fontLength = context.length; i < fontLength; i++) {
                 let font = context[i];
                 width = this.ctx.measureText(font).width;
 
@@ -555,31 +578,31 @@ MCanvas.prototype._text = function(textArr,option){
                     x = this._get(this.canvas.width,option.width,option.pos.x,'pos');
                     y += lineHeight;
                     line += 1;
-                    this.data.text[line] = {
+                    this.data.text[this.data.textId][line] = {
                         data:[],
                         lineWidth:0,
                     };
                     if(font == '|')continue;
                 }
-                this.data.text[line]['data'].push({
+                this.data.text[this.data.textId][line]['data'].push({
                     context:font,x,y,style,width,
                 });
                 length += width;
                 x += width;
-                this.data.text[line]['lineWidth'] = length;
+                this.data.text[this.data.textId][line]['lineWidth'] = length;
             }
         }else{
-            this.data.text[line]['data'].push({
+            this.data.text[this.data.textId][line]['data'].push({
                 context,x,y,style,width,
             });
             length += width;
             x += width;
-            this.data.text[line]['lineWidth'] = length;
+            this.data.text[this.data.textId][line]['lineWidth'] = length;
         }
     });
-
+        
     // 通过字体数据进行文字的绘制；
-    _.forin(this.data.text,(k,v)=>{
+    _.forin(this.data.text[this.data.textId],(k,v)=>{
         // 增加 align 的功能；
         let add = 0;
         if(v.lineWidth < option.width){
@@ -675,9 +698,11 @@ MCanvas.prototype._get = function(par,child,str,type){
             }else{
                 result = par * (+str.replace('%', '')) / 100;
             }
-        }else if(str == 'center'){
+        } else if (str == 'center'){
             result = (par-child)/2;
-        }else{
+        } else if (str == 'origin') {
+            result = child;
+        } else {
             result = +str;
         }
     }

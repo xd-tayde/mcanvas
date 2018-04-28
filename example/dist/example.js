@@ -101,7 +101,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-function MCanvas(options) {
+function MCanvas() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     // 兼容不使用 new 的方式；
     if (!(this instanceof MCanvas)) return new MCanvas(options);
 
@@ -128,6 +130,8 @@ function MCanvas(options) {
         error: function error() {}
     };
     this.data = {
+        // 文字id；
+        textId: 0,
         // 文字绘制数据；
         text: {},
         // 背景图数据;
@@ -676,9 +680,23 @@ MCanvas.prototype.text = function () {
                 y: 0
             }
         };
+
         option = _.extend(option, ops);
 
         // 解析字符串模板后，调用字体绘制函数；
+        var parseContext = _this5._parse(context);
+        var max = 0,
+            maxFont = void 0;
+        parseContext.map(function (v) {
+            if (v.size > max) {
+                max = v.size;
+                maxFont = v.type;
+            }
+        });
+        // 当设置的宽度小于字体宽度时，强行将设置宽度设为与字体一致；
+        var manFontSize = parseInt(option[maxFont + 'Style'].font);
+        if (manFontSize && option.width < manFontSize) option.width = manFontSize;
+
         _this5._text(_this5._parse(context), option);
         _this5._next();
     });
@@ -697,17 +715,21 @@ MCanvas.prototype._parse = function (context) {
             var tmp = arr[i].split(splitTag);
             result.push({
                 type: type,
-                text: tmp[0]
+                text: tmp[0],
+                // 用于字体的大小比较；
+                size: type == 'small' ? 0 : 2
             });
             tmp[1] && result.push({
                 type: 'normal',
-                text: tmp[1]
+                text: tmp[1],
+                size: 1
             });
             continue;
         }
         arr[i] && result.push({
             text: arr[i],
-            type: 'normal'
+            type: 'normal',
+            size: 1
         });
     }
     return result;
@@ -715,6 +737,9 @@ MCanvas.prototype._parse = function (context) {
 
 MCanvas.prototype._text = function (textArr, option) {
     var _this6 = this;
+
+    this.data.textId++;
+    this.data.text[this.data.textId] = {};
 
     // 处理宽度参数；
     option.width = this._get(this.canvas.width, 0, option.width, 'pos');
@@ -728,7 +753,7 @@ MCanvas.prototype._text = function (textArr, option) {
 
     // data:字体数据；
     // lineWidth:行宽；
-    this.data.text[line] = {
+    this.data.text[this.data.textId][line] = {
         data: [],
         lineWidth: 0
     };
@@ -754,31 +779,31 @@ MCanvas.prototype._text = function (textArr, option) {
                     x = _this6._get(_this6.canvas.width, option.width, option.pos.x, 'pos');
                     y += lineHeight;
                     line += 1;
-                    _this6.data.text[line] = {
+                    _this6.data.text[_this6.data.textId][line] = {
                         data: [],
                         lineWidth: 0
                     };
                     if (font == '|') continue;
                 }
-                _this6.data.text[line]['data'].push({
+                _this6.data.text[_this6.data.textId][line]['data'].push({
                     context: font, x: x, y: y, style: style, width: width
                 });
                 length += width;
                 x += width;
-                _this6.data.text[line]['lineWidth'] = length;
+                _this6.data.text[_this6.data.textId][line]['lineWidth'] = length;
             }
         } else {
-            _this6.data.text[line]['data'].push({
+            _this6.data.text[_this6.data.textId][line]['data'].push({
                 context: context, x: x, y: y, style: style, width: width
             });
             length += width;
             x += width;
-            _this6.data.text[line]['lineWidth'] = length;
+            _this6.data.text[_this6.data.textId][line]['lineWidth'] = length;
         }
     });
 
     // 通过字体数据进行文字的绘制；
-    _.forin(this.data.text, function (k, v) {
+    _.forin(this.data.text[this.data.textId], function (k, v) {
         // 增加 align 的功能；
         var add = 0;
         if (v.lineWidth < option.width) {
@@ -892,6 +917,8 @@ MCanvas.prototype._get = function (par, child, str, type) {
             }
         } else if (str == 'center') {
             result = (par - child) / 2;
+        } else if (str == 'origin') {
+            result = child;
         } else {
             result = +str;
         }
@@ -1209,6 +1236,102 @@ $(window).on('change', '.js-select', function () {
     ops.options[type] = $(this).val();
     $sure.data('ops', JSON.stringify(ops));
 });
+
+// let mc1 = new MCanvas({
+//     width: 750,
+//     height: 1143,
+// });
+// mc1.background('images/share-bg.jpg', {
+//     width: '100%',
+//     type: 'origin',
+// }).add('http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLvbgsiba9Ruka9ryibevLia9c6RBhtOOztTgPQeSLdPwfaGIKHMxRNiam6VyuNictTib4fYRD1CNJZia2gQ/132', {
+//     width: 171,
+//     pos: {
+//         x: 280,
+//         y: 329,
+//     },
+// }).add('images/mask.png', {
+//     width: 216,
+//     pos: {
+//         x: 238,
+//         y: 323,
+//     },
+// }).text('班主任指着XX对全班说：你们要记住他，毕业之后就没有机会遇到这么优秀的人了！', {
+//     width: 442,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '30px Microsoft YaHei,sans-serif',
+//         lineHeight : 40,
+//     },
+//     pos: {
+//         x: 'center',
+//         y: 766,
+//     },
+// }).text('内秀30%', {
+//     width: 145,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '24px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 110,
+//         y: 323,
+//     },
+// }).text('未知属性3%', {
+//     width: 180,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '24px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 460,
+//         y: 264,
+//     },
+// }).text('外秀67%', {
+//     width: 180,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '24px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 490,
+//         y: 470,
+//     },
+// }).text('黄明照', {
+//     width: 400,
+//     align: 'center',
+//     normalStyle: {
+//         color: '#000',
+//         font: '42px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 160,
+//         y: 522,
+//     },
+// }).text('德才兼秀', {
+//     width: 316,
+//     align: 'center',
+//     normalStyle: {
+//         color: '#fff',
+//         font: '42px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 212,
+//         y: 658,
+//     },
+// }).draw({
+//     type: 'jpg',
+//     quality: .9,
+//     success(b64) {
+//         $result.attr('src', b64);
+//         console.log(mc1);
+//     },
+// });
+
 // let img = new Image();
 // img.onload = ()=>{
 // mc.background({

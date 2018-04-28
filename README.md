@@ -4,6 +4,10 @@
 
  **[Git](https://github.com/xd-tayde/mcanvas)**
 
+## Document
+
+[English](https://github.com/xd-tayde/mcanvas/blob/master/README_EN.md) | [中文版](https://github.com/xd-tayde/mcanvas/blob/master/README_ZH.md)
+
 ## Introduction
 
 Mcanvas is a plugin that can easily compose the image, text, watermark and export a image of base64 finally. It provides some simple api that based on canvas, in order to make your work more efficiently and conveniently.
@@ -68,11 +72,6 @@ mc.background(image,{
     console.log(b64);
 });
 ```
-
-## Document
-
-[English](https://github.com/xd-tayde/mcanvas/blob/master/README_EN.md) | [中文版](https://github.com/xd-tayde/mcanvas/blob/master/README_ZH.md)
-
 
 ## License
 

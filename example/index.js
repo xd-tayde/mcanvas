@@ -301,6 +301,102 @@ $(window).on('change','.js-select',function(){
     ops.options[type] = $(this).val();
     $sure.data('ops',JSON.stringify(ops));
 });
+
+// let mc1 = new MCanvas({
+//     width: 750,
+//     height: 1143,
+// });
+// mc1.background('images/share-bg.jpg', {
+//     width: '100%',
+//     type: 'origin',
+// }).add('http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLvbgsiba9Ruka9ryibevLia9c6RBhtOOztTgPQeSLdPwfaGIKHMxRNiam6VyuNictTib4fYRD1CNJZia2gQ/132', {
+//     width: 171,
+//     pos: {
+//         x: 280,
+//         y: 329,
+//     },
+// }).add('images/mask.png', {
+//     width: 216,
+//     pos: {
+//         x: 238,
+//         y: 323,
+//     },
+// }).text('班主任指着XX对全班说：你们要记住他，毕业之后就没有机会遇到这么优秀的人了！', {
+//     width: 442,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '30px Microsoft YaHei,sans-serif',
+//         lineHeight : 40,
+//     },
+//     pos: {
+//         x: 'center',
+//         y: 766,
+//     },
+// }).text('内秀30%', {
+//     width: 145,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '24px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 110,
+//         y: 323,
+//     },
+// }).text('未知属性3%', {
+//     width: 180,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '24px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 460,
+//         y: 264,
+//     },
+// }).text('外秀67%', {
+//     width: 180,
+//     align: 'left',
+//     normalStyle: {
+//         color: '#000',
+//         font: '24px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 490,
+//         y: 470,
+//     },
+// }).text('黄明照', {
+//     width: 400,
+//     align: 'center',
+//     normalStyle: {
+//         color: '#000',
+//         font: '42px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 160,
+//         y: 522,
+//     },
+// }).text('德才兼秀', {
+//     width: 316,
+//     align: 'center',
+//     normalStyle: {
+//         color: '#fff',
+//         font: '42px Microsoft YaHei,sans-serif',
+//     },
+//     pos: {
+//         x: 212,
+//         y: 658,
+//     },
+// }).draw({
+//     type: 'jpg',
+//     quality: .9,
+//     success(b64) {
+//         $result.attr('src', b64);
+//         console.log(mc1);
+//     },
+// });
+
 // let img = new Image();
 // img.onload = ()=>{
     // mc.background({
