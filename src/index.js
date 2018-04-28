@@ -156,6 +156,7 @@ MCanvas.prototype._background = function(img, bg){
             break;
         default:
             console.error('mcanvas error:background type error!');
+            return;
     }
     this.ctx.drawImage(img,sx,sy,swidth,sheight,dx,dy,dwidth,dheight);
     this._next();
@@ -182,7 +183,7 @@ MCanvas.prototype.rect = function(ops){
         this.ctx.fillRect(x, y, width, height);
         this.ctx.closePath();
 
-        this._next();
+        this._resetCtx()._next();
     });
     return this;
 };
@@ -205,8 +206,20 @@ MCanvas.prototype.circle = function(ops){
         this.ctx.stroke();
         this.ctx.closePath();
 
-        this._next();
+        this._resetCtx()._next();
     });
+    return this;
+};
+
+// 重置ctx属性;
+MCanvas.prototype._resetCtx = function(){
+    this.ctx.fillStyle = null;
+    this.ctx.strokeStyle = null;
+    this.ctx.lineWidth = 0;
+    this.ctx.shadowColor = null;
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
     return this;
 };
 
@@ -481,7 +494,7 @@ MCanvas.prototype.text = function(context = '', ops){
 MCanvas.prototype._parse = function(context){
     let arr = context.split(/<s>|<b>/);
     let result = [];
-    for(let i=0;i<arr.length;i++){
+    for(let i= 0;i<arr.length;i++){
         let value = arr[i];
         if(/<\/s>|<\/b>/.test(value)){
             let splitTag = /<\/s>/.test(value) ? '</s>' : '</b>',
@@ -509,7 +522,7 @@ MCanvas.prototype._text = function(textArr,option){
     // 处理宽度参数；
     option.width = this._get(this.canvas.width,0,option.width,'pos');
 
-    let style,line = 1,length = 0,
+    let style, line = 1, length = 0,
         lineHeight = getLineHeight(textArr,option),
         x = this._get(this.canvas.width,option.width,option.pos.x,'pos'),
         y = (this._get(this.canvas.height,0,option.pos.y,'pos')) + lineHeight;
@@ -592,16 +605,19 @@ MCanvas.prototype._text = function(textArr,option){
         return lh;
     }
 };
+
 MCanvas.prototype._fillText = function(text){
     let {context, x, y, style} = text;
+    let {align, lineWidth, shadow} = style;
+    let {color, blur, offsetX, offsetY} = shadow;
     this.ctx.font = style.font;
-    this.ctx.textAlign = style.align;
+    this.ctx.textAlign = align;
     this.ctx.textBaseline = 'alphabetic';
-    this.ctx.lineWidth = style.lineWidth;
-    this.ctx.shadowColor = style.shadow.color;
-    this.ctx.shadowBlur = style.shadow.blur;
-    this.ctx.shadowOffsetX = style.shadow.offsetX;
-    this.ctx.shadowOffsetY = style.shadow.offsetY;
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.shadowColor = color;
+    this.ctx.shadowBlur = blur;
+    this.ctx.shadowOffsetX = offsetX;
+    this.ctx.shadowOffsetY = offsetY;
 
     if(style.gradient){
         let { type, colorStop } = style.gradient;
@@ -624,13 +640,7 @@ MCanvas.prototype._fillText = function(text){
     }
 
     this.ctx[`${style.type}Text`](context,x,y);
-
-    this.ctx[`${style.type}Style`] = null;
-    this.ctx.lineWidth = 0;
-    this.ctx.shadowColor = null;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
+    this._resetCtx();
 };
 
 // --------------------------------------------------------
@@ -677,7 +687,7 @@ MCanvas.prototype._get = function(par,child,str,type){
 // 绘制函数；
 MCanvas.prototype.draw = function(ops){
     let _ops = {
-        type:'png',
+        type:'jpg',
         quality:.9,
         success(){},
         error(){},
@@ -698,6 +708,7 @@ MCanvas.prototype.draw = function(ops){
     this._next();
     return this;
 };
+
 MCanvas.prototype._next = function(){
     if(this.queue.length > 0){
         this.queue.shift()();

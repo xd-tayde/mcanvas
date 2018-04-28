@@ -22,7 +22,11 @@ npm install mcanvas --save
 
 ```js
 // create the canvas by width and height;
-let mc = new MC(width,height);
+let mc = new MC({
+	width,
+	height,
+	backgroundColor,
+});
 
 // prepare background-image
 mc.background(image,{

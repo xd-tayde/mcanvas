@@ -31,7 +31,7 @@ export default {
             loaded(img);
             setTimeout(()=>{
                 img = null;
-            },10);
+            },1000);
         };
         img.onerror = () => {
             error('img load error');

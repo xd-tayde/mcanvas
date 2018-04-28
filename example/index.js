@@ -53,7 +53,7 @@ let data = {
             align:'center',
             largeStyle:{
                 color:'red',
-                font: '80px Microsoft YaHei,sans-serif',
+                font: '90px Microsoft YaHei,sans-serif',
                 type: 'stroke',
                 lineWidth: 2,
                 lineHeight : 100,
@@ -75,7 +75,7 @@ let data = {
             },
             smallStyle:{
                 color:'yellow',
-                font:'60px Microsoft YaHei,sans-serif',
+                font:'50px Microsoft YaHei,sans-serif',
                 // lineHeight : 100,
                 shadow:{
                     color: 'red',

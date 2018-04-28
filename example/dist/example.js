@@ -41,7 +41,7 @@ var _ = {
             loaded(img);
             setTimeout(function () {
                 img = null;
-            }, 10);
+            }, 1000);
         };
         img.onerror = function () {
             error('img load error');
@@ -273,6 +273,7 @@ MCanvas.prototype._background = function (img, bg) {
             break;
         default:
             console.error('mcanvas error:background type error!');
+            return;
     }
     this.ctx.drawImage(img, sx, sy, swidth, sheight, dx, dy, dwidth, dheight);
     this._next();
@@ -308,7 +309,7 @@ MCanvas.prototype.rect = function (ops) {
         _this2.ctx.fillRect(x, y, width, height);
         _this2.ctx.closePath();
 
-        _this2._next();
+        _this2._resetCtx()._next();
     });
     return this;
 };
@@ -340,8 +341,20 @@ MCanvas.prototype.circle = function (ops) {
         _this3.ctx.stroke();
         _this3.ctx.closePath();
 
-        _this3._next();
+        _this3._resetCtx()._next();
     });
+    return this;
+};
+
+// 重置ctx属性;
+MCanvas.prototype._resetCtx = function () {
+    this.ctx.fillStyle = null;
+    this.ctx.strokeStyle = null;
+    this.ctx.lineWidth = 0;
+    this.ctx.shadowColor = null;
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
     return this;
 };
 
@@ -792,20 +805,28 @@ MCanvas.prototype._text = function (textArr, option) {
         return lh;
     }
 };
+
 MCanvas.prototype._fillText = function (text) {
     var context = text.context,
         x = text.x,
         y = text.y,
         style = text.style;
+    var align = style.align,
+        lineWidth = style.lineWidth,
+        shadow = style.shadow;
+    var color = shadow.color,
+        blur = shadow.blur,
+        offsetX = shadow.offsetX,
+        offsetY = shadow.offsetY;
 
     this.ctx.font = style.font;
-    this.ctx.textAlign = style.align;
+    this.ctx.textAlign = align;
     this.ctx.textBaseline = 'alphabetic';
-    this.ctx.lineWidth = style.lineWidth;
-    this.ctx.shadowColor = style.shadow.color;
-    this.ctx.shadowBlur = style.shadow.blur;
-    this.ctx.shadowOffsetX = style.shadow.offsetX;
-    this.ctx.shadowOffsetY = style.shadow.offsetY;
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.shadowColor = color;
+    this.ctx.shadowBlur = blur;
+    this.ctx.shadowOffsetX = offsetX;
+    this.ctx.shadowOffsetY = offsetY;
 
     if (style.gradient) {
         var _style$gradient = style.gradient,
@@ -834,13 +855,7 @@ MCanvas.prototype._fillText = function (text) {
     }
 
     this.ctx[style.type + 'Text'](context, x, y);
-
-    this.ctx[style.type + 'Style'] = null;
-    this.ctx.lineWidth = 0;
-    this.ctx.shadowColor = null;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
+    this._resetCtx();
 };
 
 // --------------------------------------------------------
@@ -889,7 +904,7 @@ MCanvas.prototype.draw = function (ops) {
     var _this7 = this;
 
     var _ops = {
-        type: 'png',
+        type: 'jpg',
         quality: .9,
         success: function success() {},
         error: function error() {}
@@ -911,6 +926,7 @@ MCanvas.prototype.draw = function (ops) {
     this._next();
     return this;
 };
+
 MCanvas.prototype._next = function () {
     if (this.queue.length > 0) {
         this.queue.shift()();
@@ -977,7 +993,7 @@ var data = {
             align: 'center',
             largeStyle: {
                 color: 'red',
-                font: '80px Microsoft YaHei,sans-serif',
+                font: '90px Microsoft YaHei,sans-serif',
                 type: 'stroke',
                 lineWidth: 2,
                 lineHeight: 100
@@ -999,7 +1015,7 @@ var data = {
             },
             smallStyle: {
                 color: 'yellow',
-                font: '60px Microsoft YaHei,sans-serif',
+                font: '50px Microsoft YaHei,sans-serif',
                 // lineHeight : 100,
                 shadow: {
                     color: 'red',
