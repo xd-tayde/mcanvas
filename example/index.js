@@ -56,12 +56,12 @@ let data = {
                 font: '90px Microsoft YaHei,sans-serif',
                 type: 'stroke',
                 lineWidth: 2,
-                lineHeight : 100,
+                lineHeight : 90,
             },
             normalStyle:{
                 color:'blue',
                 font:'70px Microsoft YaHei,sans-serif',
-                // lineHeight : 100,
+                lineHeight : 70,
                 // shadow:{
                 //     color: 'red',
                 //     blur: 4,
@@ -76,7 +76,7 @@ let data = {
             smallStyle:{
                 color:'yellow',
                 font:'50px Microsoft YaHei,sans-serif',
-                // lineHeight : 100,
+                lineHeight : 50,
                 shadow:{
                     color: 'red',
                     blur: 10,
@@ -87,6 +87,7 @@ let data = {
             pos:{
                 x:'center',
                 y:'bottom:400',
+                rotate: 0,
             },
         },
     },

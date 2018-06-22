@@ -147,6 +147,7 @@ MCanvas.prototype._init = function () {
     this.canvas.width = this.ops.width;
     this.canvas.height = this.ops.height;
     this.ctx = this.canvas.getContext('2d');
+    this.ctx.save();
 
     this.ops.backgroundColor && this.setBgColor(this.ops.backgroundColor);
 };
@@ -352,13 +353,8 @@ MCanvas.prototype.circle = function (ops) {
 
 // 重置ctx属性;
 MCanvas.prototype._resetCtx = function () {
-    this.ctx.fillStyle = null;
-    this.ctx.strokeStyle = null;
-    this.ctx.lineWidth = 0;
-    this.ctx.shadowColor = null;
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.restore();
     return this;
 };
 
@@ -677,7 +673,8 @@ MCanvas.prototype.text = function () {
             }, _.deepCopy(defaultStyle)),
             pos: {
                 x: 0,
-                y: 0
+                y: 0,
+                rotate: 0
             }
         };
 
@@ -694,11 +691,11 @@ MCanvas.prototype.text = function () {
             }
         });
         // 当设置的宽度小于字体宽度时，强行将设置宽度设为与字体一致；
-        var manFontSize = parseInt(option[maxFont + 'Style'].font);
-        if (manFontSize && option.width < manFontSize) option.width = manFontSize;
+        var maxFontSize = parseInt(option[maxFont + 'Style'].font);
+        if (maxFontSize && option.width < maxFontSize) option.width = maxFontSize;
 
-        _this5._text(_this5._parse(context), option);
-        _this5._next();
+        _this5._text(parseContext, option);
+        _this5._resetCtx()._next();
     });
     return this;
 };
@@ -748,8 +745,8 @@ MCanvas.prototype._text = function (textArr, option) {
         line = 1,
         length = 0,
         lineHeight = getLineHeight(textArr, option),
-        x = this._get(this.canvas.width, option.width, option.pos.x, 'pos'),
-        y = this._get(this.canvas.height, 0, option.pos.y, 'pos') + lineHeight;
+        x = this._get(this.canvas.width, option.width, 0, 'pos'),
+        y = this._get(this.canvas.height, 0, 0, 'pos') + lineHeight;
 
     // data:字体数据；
     // lineWidth:行宽；
@@ -776,7 +773,7 @@ MCanvas.prototype._text = function (textArr, option) {
                 // 当字体的计算宽度 > 设置的宽度 || 内容中包含换行时,进入换行逻辑；
                 if (length + width > option.width || font == '|') {
                     length = 0;
-                    x = _this6._get(_this6.canvas.width, option.width, option.pos.x, 'pos');
+                    x = _this6._get(_this6.canvas.width, option.width, 0, 'pos');
                     y += lineHeight;
                     line += 1;
                     _this6.data.text[_this6.data.textId][line] = {
@@ -802,6 +799,16 @@ MCanvas.prototype._text = function (textArr, option) {
         }
     });
 
+    // 创建文字画布；
+    var tcvs = document.createElement('canvas');
+    var tctx = tcvs.getContext('2d');
+    var tdx = this._get(this.canvas.width, option.width, option.pos.x, 'pos'),
+        tdy = this._get(this.canvas.height, 0, option.pos.y, 'pos');
+    var tdw = void 0,
+        tdh = void 0;
+    tdw = tcvs.width = option.width;
+    tdh = tcvs.height = this._getTextRectHeight(line);
+
     // 通过字体数据进行文字的绘制；
     _.forin(this.data.text[this.data.textId], function (k, v) {
         // 增加 align 的功能；
@@ -815,9 +822,19 @@ MCanvas.prototype._text = function (textArr, option) {
         }
         v.data.forEach(function (text) {
             text.x += add;
-            _this6._fillText(text);
+            _this6._fillText(tctx, text);
         });
     });
+
+    // tcvs.style.width = '300px';
+    // document.querySelector('body').appendChild(tcvs);
+
+    // 绘制文字画布；
+    var originX = tdx + tdw / 2,
+        originY = tdy + tdh / 2;
+    this.ctx.translate(originX, originY);
+    this.ctx.rotate(parseFloat(option.pos.rotate) * Math.PI / 180);
+    this.ctx.drawImage(tcvs, -tdw / 2, -tdh / 2, tdw, tdh);
 
     // 获取行高；
     function getLineHeight(textArr, option) {
@@ -831,7 +848,7 @@ MCanvas.prototype._text = function (textArr, option) {
     }
 };
 
-MCanvas.prototype._fillText = function (text) {
+MCanvas.prototype._fillText = function (ctx, text) {
     var context = text.context,
         x = text.x,
         y = text.y,
@@ -844,14 +861,14 @@ MCanvas.prototype._fillText = function (text) {
         offsetX = shadow.offsetX,
         offsetY = shadow.offsetY;
 
-    this.ctx.font = style.font;
-    this.ctx.textAlign = align;
-    this.ctx.textBaseline = 'alphabetic';
-    this.ctx.lineWidth = lineWidth;
-    this.ctx.shadowColor = color;
-    this.ctx.shadowBlur = blur;
-    this.ctx.shadowOffsetX = offsetX;
-    this.ctx.shadowOffsetY = offsetY;
+    ctx.font = style.font;
+    ctx.textAlign = align;
+    ctx.textBaseline = 'alphabetic';
+    ctx.lineWidth = lineWidth;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = blur;
+    ctx.shadowOffsetX = offsetX;
+    ctx.shadowOffsetY = offsetY;
 
     if (style.gradient) {
         var _style$gradient = style.gradient,
@@ -869,18 +886,23 @@ MCanvas.prototype._fillText = function (text) {
             x1 = x;y1 = y - style.lineHeight;
             x2 = x;y2 = y;
         }
-        var grad = this.ctx.createLinearGradient(x1, y1, x2, y2);
+        var grad = ctx.createLinearGradient(x1, y1, x2, y2);
         var colorNum = colorStop.length || 0;
         _.forin(colorStop, function (i, v) {
             grad.addColorStop(1 / colorNum * (+i + 1), v);
         });
-        this.ctx[style.type + 'Style'] = grad;
+        ctx[style.type + 'Style'] = grad;
     } else {
-        this.ctx[style.type + 'Style'] = style.color;
+        ctx[style.type + 'Style'] = style.color;
     }
 
-    this.ctx[style.type + 'Text'](context, x, y);
+    ctx[style.type + 'Text'](context, x, y);
     this._resetCtx();
+};
+
+MCanvas.prototype._getTextRectHeight = function (lastLine) {
+    var lastLineData = this.data.text[this.data.textId][lastLine].data[0];
+    return lastLineData.y + lastLineData.style.lineHeight;
 };
 
 // --------------------------------------------------------
@@ -1023,12 +1045,12 @@ var data = {
                 font: '90px Microsoft YaHei,sans-serif',
                 type: 'stroke',
                 lineWidth: 2,
-                lineHeight: 100
+                lineHeight: 90
             },
             normalStyle: {
                 color: 'blue',
                 font: '70px Microsoft YaHei,sans-serif',
-                // lineHeight : 100,
+                lineHeight: 70,
                 // shadow:{
                 //     color: 'red',
                 //     blur: 4,
@@ -1043,7 +1065,7 @@ var data = {
             smallStyle: {
                 color: 'yellow',
                 font: '50px Microsoft YaHei,sans-serif',
-                // lineHeight : 100,
+                lineHeight: 50,
                 shadow: {
                     color: 'red',
                     blur: 10,
@@ -1053,7 +1075,8 @@ var data = {
             },
             pos: {
                 x: 'center',
-                y: 'bottom:400'
+                y: 'bottom:400',
+                rotate: 0
             }
         }
     }
