@@ -11,10 +11,10 @@
     },
     "parser": "babel-eslint",
     "rules": {
-        "semi": [2, "always"],
+        "semi": [2, "never"],
         "quotes": [2, "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
         "comma-dangle": [2, "always-multiline"],
-        "no-console": [0, { allow: ["warn", "error"] }],
+        "no-console": [0, { "allow": ["warn", "error"] }],
         "no-multiple-empty-lines": [2, { "max": 1 }]
     },
     "globals": {

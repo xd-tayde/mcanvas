@@ -1,8 +1,14 @@
 {
 	"name": "mcanvas",
-	"version": "1.3.4",
+	"version": "1.3.5",
 	"description": "the image-composer or image-croper that can draw image/text/watermark or crop the image.",
-	"keywords":["canvas","image-composite","image-textview","watermark","image-crop"],
+	"keywords": [
+		"canvas",
+		"image-composite",
+		"image-textview",
+		"watermark",
+		"image-crop"
+	],
 	"main": "dist/mcanvas.js",
 	"module": "dist/mcanvas.es.js",
 	"moduleName": "MCanvas",
@@ -19,21 +25,30 @@
 		"url": "https://github.com/xd-tayde/mcanvas",
 		"type": "git"
 	},
-	"author": "gxd <lbc@meitu.com>",
+	"author": "gxd",
 	"license": "MIT",
 	"devDependencies": {
+		"@babel/core": "^7.4.0",
+		"@babel/preset-env": "^7.4.2",
 		"babel-eslint": "^7.2.2",
+		"babel-plugin-external-helpers": "^6.22.0",
 		"babel-plugin-syntax-flow": "^6.18.0",
 		"babel-plugin-transform-class-properties": "^6.24.1",
 		"babel-plugin-transform-flow-strip-types": "^6.22.0",
+		"babel-plugin-transform-object-rest-spread": "^6.26.0",
+		"babel-preset-env": "^1.7.0",
 		"babel-preset-es2015": "^6.24.1",
+		"babel-preset-latest": "^6.24.1",
 		"eslint": "^3.19.0",
 		"expect.js": "^0.3.1",
 		"mocha": "^3.2.0",
-		"rollup-plugin-babel": "^2.7.1",
-		"rollup-plugin-node-resolve": "^3.0.0",
+		"rollup": "^1.7.4",
+		"rollup-plugin-babel": "^4.3.2",
+		"rollup-plugin-commonjs": "^9.2.2",
+		"rollup-plugin-node-resolve": "^4.0.1",
 		"rollup-plugin-sourcemaps": "^0.4.2",
-		"rollup-plugin-uglify": "^1.0.1",
-		"rollup-watch": "^3.2.2"
-	}
+		"rollup-plugin-uglify": "^6.0.2",
+		"rollup-watch": "^4.3.1"
+	},
+	"dependencies": {}
 }
