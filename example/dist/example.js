@@ -3,6 +3,8 @@
   factory();
 }(function () { 'use strict';
 
+  document.write('<script src="http://' + (location.host || "localhost").split(":")[0] + ':35729/livereload.js?snipver=1"></' + "script>")
+
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
       _typeof = function (obj) {
@@ -593,8 +595,8 @@
 
     var lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4;
     var spaceX, spaceY;
-    lcvs.width = lsw * lctxScale;
-    lcvs.height = lsh * lctxScale; // 限制canvas的大小，ios8以下为 2096, 其余平台均限制为 4096;
+    lcvs.width = Math.round(lsw * lctxScale);
+    lcvs.height = Math.round(lsh * lctxScale); // 限制canvas的大小，ios8以下为 2096, 其余平台均限制为 4096;
 
     var shrink;
 
@@ -635,17 +637,15 @@
 
     lctx.translate(lcvs.width / 2, lcvs.height / 2);
     lctx.rotate(ops.pos.rotate);
-    lctx.drawImage(img, lsx, lsy, lsw, lsh, ldx, ldy, ldw, ldh); // lcvs.style.width = '300px';
-    // document.querySelector('body').appendChild(lcvs);
-
-    cdw = ops.width * lctxScale;
-    cdh = cdw / cratio;
+    lctx.drawImage(img, lsx, lsy, lsw, lsh, ldx, ldy, ldw, ldh);
+    cdw = Math.round(ops.width * lctxScale);
+    cdh = Math.round(cdw / cratio);
     spaceX = (lctxScale - 1) * ops.width / 2;
     spaceY = spaceX / cratio; // 获取素材的位置；
     //    配置的位置 - 缩放的影响 - 绘制成正方形的影响；
 
-    cdx = ops.pos.x + cdw * (1 - ops.pos.scale) / 2 - spaceX;
-    cdy = ops.pos.y + cdh * (1 - ops.pos.scale) / 2 - spaceY;
+    cdx = Math.round(ops.pos.x + cdw * (1 - ops.pos.scale) / 2 - spaceX);
+    cdy = Math.round(ops.pos.y + cdh * (1 - ops.pos.scale) / 2 - spaceY);
     cdw *= ops.pos.scale;
     cdh *= ops.pos.scale;
     this.ctx.drawImage(lcvs, cdx, cdy, cdw, cdh);
@@ -1093,14 +1093,18 @@
     return this;
   };
 
-  // mcrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
+  // console.log(MCrop)
+  // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
   //     type: 'rect',
-  //     x: 600,
-  //     y: 900,
-  //     width: 100,
-  //     height: 100,
+  //     x: 'center',
+  //     y: 100,
+  //     width: 300,
+  //     height: 300,
+  //     success(b64) {
+  //         document.querySelector('#img111').src = b64
+  //     },
   // })
-  // mcrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
+  // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
   //     type: 'circle',
   //     x: 'center',
   //     y: '0',

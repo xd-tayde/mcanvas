@@ -1,15 +1,19 @@
-import MCanvas from '../src/index'
+import MCanvas from '../lib/index'
+// import { MCrop } from '../src/index'
 
-// console.log(mcrop)
+// console.log(MCrop)
 
-// mcrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
+// MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 //     type: 'rect',
-//     x: 600,
-//     y: 900,
-//     width: 100,
-//     height: 100,
+//     x: 'center',
+//     y: 100,
+//     width: 300,
+//     height: 300,
+//     success(b64) {
+//         document.querySelector('#img111').src = b64
+//     },
 // })
-// mcrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
+// MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 //     type: 'circle',
 //     x: 'center',
 //     y: '0',
