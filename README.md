@@ -73,6 +73,24 @@ mc.background(image,{
 });
 ```
 
+```js
+// MCrop,  a image cropper
+import { MCrop } from 'mcanvas'
+MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
+    // cropper shape
+    type: 'circle',
+    // crop by pos
+    x: 'center',
+    y: '0',
+    // radius
+    r: 200,
+    // the success callback
+    success(b64) {
+        // the base64 of cropped image
+    },
+})
+```
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)

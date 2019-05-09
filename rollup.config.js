@@ -27,6 +27,9 @@ switch (env) {
     case 'example':
         fileName = `example`
         break
+    case 'es':
+        fileName = `${packages.name}.es`
+        break
     case 'production':
         fileName = `${packages.name}.min`
         break
@@ -36,8 +39,8 @@ const Config = {
     input: `${paths.input}index`,
     output: {
         file: `${paths.dist}${fileName}.js`,
-        format: 'umd',
-        name: packages.name,
+        format: env === 'es' ? 'es' : 'umd',
+        name: 'MCanvas',
         sourcemap: true,
         // 连接 livereload 
         intro: env === 'example' ? `document.write('<script src="http://' + (location.host || "localhost").split(":")[0] + ':35729/livereload.js?snipver=1"></' + "script>")` : '',

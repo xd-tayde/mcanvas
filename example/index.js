@@ -1,8 +1,6 @@
 import MCanvas from '../lib/index'
 // import { MCrop } from '../src/index'
 
-// console.log(MCrop)
-
 // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 //     type: 'rect',
 //     x: 'center',
@@ -93,7 +91,7 @@ let data = {
                 // },
                 gradient:{
                     type: 2,  // 1: 横向渐变； 2: 纵向渐变；
-                    colorStop: ['red','blue'],
+                    colorStop: ['red', 'blue'],
                 },
             },
             smallStyle:{
@@ -115,13 +113,12 @@ let data = {
         },
     },
 }
-
 let mc = new MCanvas({
     width: 1000,
     height: 1500,
     // backgroundColor: 'black',
 })
-mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
+mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 // mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
     type:'origin',
     left:'50%',
@@ -129,69 +126,69 @@ mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg',{
 })
 
 let timer
-$('.Button').on('touchstart',function(){
+$('.Button').on('touchstart', function(){
     $(this).addClass('taped')
     timer = setTimeout(()=>{
         $(this).removeClass('taped')
-    },2000)
+    }, 2000)
 })
-$('.Button').on('touchend',function(){
+$('.Button').on('touchend', function(){
     $(this).removeClass('taped')
     clearTimeout(timer)
 })
 
-$cancel.on('click',()=>{
+$cancel.on('click', ()=>{
     $dialog.hide()
 })
 
-$clear.on('click',()=>{
+$clear.on('click', ()=>{
     // mc.clear();
     mc.background().clear().draw(b64=>{
-        $result.attr('src',b64)
+        $result.attr('src', b64)
     })
 })
 
-$('.js-addImage').on('click',()=>{
+$('.js-addImage').on('click', ()=>{
     let type = `image`
-    showDialog(type,data.addImageOps)
+    showDialog(type, data.addImageOps)
 })
 
-$('.js-addWm').on('click',()=>{
+$('.js-addWm').on('click', ()=>{
     let type = `watermark`
-    showDialog(type,data.addWmOps)
+    showDialog(type, data.addWmOps)
 })
 
-$('.js-addText').on('click',()=>{
+$('.js-addText').on('click', ()=>{
     let type = `text`
-    showDialog(type,data.addTextOps)
+    showDialog(type, data.addTextOps)
 })
 
-$('.js-addRect').on('click',()=>{
+$('.js-addRect').on('click', ()=>{
     mcDraw(data.addRectOps, 'rect')
 })
 
-$('.js-addCircle').on('click',()=>{
+$('.js-addCircle').on('click', ()=>{
     mcDraw(data.addCircleOps, 'circle')
 })
 
-$sure.on('click',function(){
+$sure.on('click', function(){
     let ops = $(this).data('ops')
     let type = $(this).data('type')
-    mcDraw(ops,type)
+    mcDraw(ops, type)
 })
 
-function mcDraw(ops,type){
+function mcDraw(ops, type){
     let img
     switch (type) {
         case `image`:
             img = new Image()
             img.crossOrigin = '*'
             img.onload = function(){
-                mc.add(img,ops.options).draw({
+                mc.add(img, ops.options).draw({
                     type:'jpg',
                     quality:.9,
                     success(b64){
-                        $result.attr('src',b64)
+                        $result.attr('src', b64)
                         $dialog.hide()
                     },
                     error(err){
@@ -202,26 +199,26 @@ function mcDraw(ops,type){
             img.src = ops.image
             break
         case `watermark`:
-            mc.watermark(ops.image,ops.options).draw(b64=>{
-                $result.attr('src',b64)
+            mc.watermark(ops.image, ops.options).draw(b64=>{
+                $result.attr('src', b64)
                 $dialog.hide()
             })
             break
         case `text`:
-            mc.text(ops.text,ops.options).draw(b64=>{
-                $result.attr('src',b64)
+            mc.text(ops.text, ops.options).draw(b64=>{
+                $result.attr('src', b64)
                 $dialog.hide()
             })
             break
         case `rect`:
             mc.rect(ops).draw(b64=>{
-                $result.attr('src',b64)
+                $result.attr('src', b64)
                 $dialog.hide()
             })
             break
         case `circle`:
             mc.circle(ops).draw(b64=>{
-                $result.attr('src',b64)
+                $result.attr('src', b64)
                 $dialog.hide()
             })
             break
@@ -230,7 +227,7 @@ function mcDraw(ops,type){
 
 }
 
-function showDialog(type,ops){
+function showDialog(type, ops){
     let tab = `&nbsp;&nbsp;&nbsp;&nbsp;`
     let html
     switch (type) {
@@ -239,10 +236,10 @@ function showDialog(type,ops){
                     <li>options:{</li>
                     <li>${tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
                     <li>${tab}pos:{</li>
-                    <li>${tab+tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
-                    <li>${tab+tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
-                    <li>${tab+tab}scale:<input data-type='scale' class='js-input input' type='text' value='${ops.options.pos.scale}'></li>
-                    <li>${tab+tab}rotate:<input data-type='rotate' class='js-input input' type='text' value='${ops.options.pos.rotate}'></li>
+                    <li>${tab + tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
+                    <li>${tab + tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
+                    <li>${tab + tab}scale:<input data-type='scale' class='js-input input' type='text' value='${ops.options.pos.scale}'></li>
+                    <li>${tab + tab}rotate:<input data-type='rotate' class='js-input input' type='text' value='${ops.options.pos.rotate}'></li>
                     <li>${tab}}</li>
                     <li>}</li>`
             break
@@ -271,19 +268,19 @@ function showDialog(type,ops){
                         </select>
                     </li>
                     <li>${tab}pos:{
-                    <li>${tab+tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
-                    <li>${tab+tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
+                    <li>${tab + tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
+                    <li>${tab + tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
                     <li>${tab}}</li>
                     <li>}</li>`
             break
         default:
     }
     $params.html(html)
-    $sure.data('ops',JSON.stringify(ops)).data('type',type)
+    $sure.data('ops', JSON.stringify(ops)).data('type', type)
     $dialog.show()
 }
 
-$(window).on('input','.js-input',function(){
+$(window).on('input', '.js-input', function(){
     let $this = $(this)
     let v = $this.val()
     let type = $this.data('type')
@@ -309,20 +306,20 @@ $(window).on('input','.js-input',function(){
             break
         default:
     }
-    $sure.data('ops',JSON.stringify(ops))
+    $sure.data('ops', JSON.stringify(ops))
 })
 
-$(window).on('focus','.js-input',function(){
+$(window).on('focus', '.js-input', function(){
     $(this).addClass('focus')
 })
-$(window).on('blur','.js-input',function(){
+$(window).on('blur', '.js-input', function(){
     $(this).removeClass('focus')
 })
 
-$(window).on('change','.js-select',function(){
+$(window).on('change', '.js-select', function(){
     let ops = $sure.data('ops')
     let type = $(this).data('type')
     ops.options[type] = $(this).val()
-    $sure.data('ops',JSON.stringify(ops))
+    $sure.data('ops', JSON.stringify(ops))
 })
 

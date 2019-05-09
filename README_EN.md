@@ -264,3 +264,28 @@ mc.draw({
     }
 })
 ```
+
+## MCrop
+
+MCrop is a simple image cropper.
+
+```js
+interface IMCropOps {
+    type: 'rect' | 'circle'
+    // point of left top
+    x: number | string 
+    y: number | string
+    // if type = 'rect'
+    width?: number | string
+    height?: number | string
+    // if type = 'circle'
+    r?: number | string
+    exportConfig?: {
+        type: 'jpg' | 'png' | 'jpeg'
+        quality: number (0 - 1)
+    }
+    // the success callback
+    success(b64) {}
+}
+MCrop(image, ops: IMCropOps)
+```

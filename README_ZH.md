@@ -5,9 +5,9 @@
 在业务中，经常遇到各种合成图片的需求，如贴纸的合成，合成文字，添加水印等，因为这些业务经常需要进行各种位置，状态等参数的计算，写起来并不是那么方便。该插件就是为了解决这部分难点，封装底层 `API` 及各种计算，提供出使用更为简单的 `API`，减少项目上的重复工作，提高效率；
 
 ## 更新：
-- 1.3.5 (2019-5-9)
+- 1.3.8 (2019-5-9)
     - 升级新版 rollup 脚手架 (rollup-typescript-startkit);
-    - 新增图片裁剪工具 MCrop;
+    - 新增图片裁剪工具 MCrop, 更新文档;
     - 修复小数点计算问题导致图片变模糊的问题；
     
 - 1.3.4 (6.22)
@@ -445,3 +445,29 @@ mc.draw({
 ##### 2、`mc.ctx`: 画布；
 
 ##### 3、`mc.textData` :  文字数据 type:object；
+
+
+## 新暴露 MCrop 类
+
+MCrop 是轻量级的图片裁剪工具，使用方法如下:
+
+```js
+interface IMCropOps {
+    type: 'rect' | 'circle'
+    // 左上角坐标
+    x: number | string 
+    y: number | string
+    // type = 'rect' 时有效
+    width?: number | string
+    height?: number | string
+    // type = 'circle' 时有效   
+    r?: number | string
+    exportConfig?: {
+        type: 'jpg' | 'png' | 'jpeg'
+        quality: number (0 - 1)
+    }
+    // the success callback
+    success(b64) {}
+}
+MCrop(image, ops: IMCropOps)
+```
