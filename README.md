@@ -15,18 +15,23 @@ Mcanvas is a plugin that can easily compose the image, text, watermark and expor
 ## Installation
 
 - You can download the latest version from the [GitHub](https://github.com/xd-tayde/mcanvas/blob/master/dist/mcanvas.min.js)
-- use a npm [CDN](https://unpkg.com/mcanvas/dist/mcanvas.min.js).
+- use a npm [CDN](https://unpkg.com/mcanvas/dist/mcanvas.min.js) and use `window.MCanvas`
+
 - Or you can install via npm:
 
 ```js
 npm install mcanvas --save
+
+import MCanvas from 'mcanvas'
 ```
 
 ## Basic Usage
 
 ```js
 // create the canvas by width and height;
-let mc = new MC({
+import MC from 'mcanvas'
+
+const mc = new MC({
 	width,
 	height,
 	backgroundColor,
@@ -76,6 +81,7 @@ mc.background(image,{
 ```js
 // MCrop,  a image cropper
 import { MCrop } from 'mcanvas'
+
 MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
     // cropper shape
     type: 'circle',

@@ -1050,7 +1050,7 @@
     var _this7 = this;
 
     var _ops = {
-      type: 'jpg',
+      type: 'jpeg',
       quality: .9,
       success: function success() {},
       error: function error() {}
@@ -1125,7 +1125,8 @@
     }
 
     return Math.round(result);
-  };
+  }; // 获取长度
+
 
   var getLength = function getLength(imgW, str) {
     if (!str && str !== 0) return str;
@@ -1218,22 +1219,24 @@
 
       setTimeout(function () {
         var exportConfig = _.extend({
-          type: 'jpg',
+          type: 'jpeg',
           quality: .9
         }, ops.exportConfig || {});
+
+        if (type === 'circle') {
+          exportConfig.type = 'png';
+        }
 
         var b64 = cvs.toDataURL("image/".concat(exportConfig.type), exportConfig.quality);
         success(b64);
       }, 0);
     }, function (err) {
-      console.error('mcrop error : load image error.', err);
+      console.error('mcrop error: load image error.', err);
       error(err);
     });
   }
 
   var MCrop$1 = MCrop;
-  if (!window.MCanvas) window.MCanvas = MCanvas;
-  if (!window.MCrop) window.MCrop = MCrop$1;
 
   exports.MCrop = MCrop$1;
   exports.default = MCanvas;

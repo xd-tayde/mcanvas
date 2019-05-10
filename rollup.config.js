@@ -41,6 +41,7 @@ const Config = {
         file: `${paths.dist}${fileName}.js`,
         format: env === 'es' ? 'es' : 'umd',
         name: 'MCanvas',
+        exports: 'named', 
         sourcemap: true,
         // 连接 livereload 
         intro: env === 'example' ? `document.write('<script src="http://' + (location.host || "localhost").split(":")[0] + ':35729/livereload.js?snipver=1"></' + "script>")` : '',

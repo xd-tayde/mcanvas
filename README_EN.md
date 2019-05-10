@@ -270,6 +270,8 @@ mc.draw({
 MCrop is a simple image cropper.
 
 ```js
+import { MCrop } from 'mcanvas'
+
 interface IMCropOps {
     type: 'rect' | 'circle'
     // point of left top

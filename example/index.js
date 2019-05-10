@@ -1,5 +1,5 @@
 import MCanvas from '../lib/index'
-// import { MCrop } from '../src/index'
+// import { MCrop } from '../lib/index'
 
 // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 //     type: 'rect',

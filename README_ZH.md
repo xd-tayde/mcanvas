@@ -5,6 +5,11 @@
 在业务中，经常遇到各种合成图片的需求，如贴纸的合成，合成文字，添加水印等，因为这些业务经常需要进行各种位置，状态等参数的计算，写起来并不是那么方便。该插件就是为了解决这部分难点，封装底层 `API` 及各种计算，提供出使用更为简单的 `API`，减少项目上的重复工作，提高效率；
 
 ## 更新：
+- 1.3.9 (2019-5-10)
+    - 优化文档；
+    - 修复 MCrop 裁剪时图片格式的设置问题；
+    - 优化 rollup 打包，导出 MCrop 方法；
+
 - 1.3.8 (2019-5-9)
     - 升级新版 rollup 脚手架 (rollup-typescript-startkit);
     - 新增图片裁剪工具 MCrop, 更新文档;
@@ -309,8 +314,8 @@ options:{
 
     // 可通过 smallStyle/normalStyle/largeStyle 分别进行配置；
     // 小字的样式
-    // 以smallStyle为栗，normalStyle/largeStyle使用方式一致；
-    smallStyle:{
+    // 以 normalStyle 为栗，smallStyle/largeStyle使用方式一致；
+    normalStyle:{
 
     	 // 文字样式，包含字体/字号等，使用方式与css font一致；
         font : ``,
@@ -452,6 +457,8 @@ mc.draw({
 MCrop 是轻量级的图片裁剪工具，使用方法如下:
 
 ```js
+import { MCrop } from 'mcanvas'
+
 interface IMCropOps {
     type: 'rect' | 'circle'
     // 左上角坐标

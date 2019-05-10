@@ -72,7 +72,7 @@ html,body{
 .addBtn{
     display: inline-block;
     width: 90%;
-    margin: 15px 0;
+    margin: 30px 0;
 }
 
 .Button{
@@ -101,14 +101,14 @@ html,body{
     color: #996699;
     font-size: 40px;
     line-height: 60px;
-    margin-bottom: 10px;
+    margin: 10px 0;
 }
 .sub-title{
     text-align: center;
     color: #996699;
     font-size: 20px;
     line-height: 30px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     padding: 0 20px;
 }
 
