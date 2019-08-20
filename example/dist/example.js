@@ -252,7 +252,6 @@
     this.canvas.width = this.ops.width;
     this.canvas.height = this.ops.height;
     this.ctx = this.canvas.getContext('2d');
-    this.ctx.save();
     this.ops.backgroundColor && this.setBgColor(this.ops.backgroundColor);
   }; // --------------------------------------------------------
   // 绘制背景部分；
@@ -467,7 +466,6 @@
 
   MCanvas.prototype._resetCtx = function () {
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.restore();
     return this;
   }; // 绘制水印；基于 add 函数封装；
 
@@ -1082,7 +1080,9 @@
 
   MCanvas.prototype._next = function () {
     if (this.queue.length > 0) {
+      this.ctx.save();
       this.queue.shift()();
+      this.ctx.restore();
     } else {
       this.fn.success();
     }
