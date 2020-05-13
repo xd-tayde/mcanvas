@@ -1,4 +1,9 @@
-import MCanvas from '../lib/index'
+import { MComposer } from '../src/index'
+import ear from './images/ear.png'
+import watermark from './images/watermark.jpg'
+
+import './main.scss'
+
 // import { MCrop } from '../lib/index'
 
 // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
@@ -30,7 +35,7 @@ let $clear = $('.js-clear')
 
 let data = {
     addImageOps : {
-        image:'./images/ear.png',
+        image: ear,
         // image:'https://mtapplet.meitudata.com/59c8c479521876738.jpg',
         options:{
             width:482,
@@ -43,7 +48,7 @@ let data = {
         },
     },
     addWmOps : {
-        image:'images/watermark.jpg',
+        image: watermark,
         options:{
             width:'40%',
             pos:'rightBottom',
@@ -113,7 +118,7 @@ let data = {
         },
     },
 }
-let mc = new MCanvas({
+let mc = new MComposer({
     width: 1000,
     height: 1500,
     // backgroundColor: 'black',
@@ -126,13 +131,13 @@ mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 })
 
 let timer
-$('.Button').on('touchstart', function(){
+$('.Button').on('touchstart', function(this: any){
     $(this).addClass('taped')
     timer = setTimeout(()=>{
         $(this).removeClass('taped')
     }, 2000)
 })
-$('.Button').on('touchend', function(){
+$('.Button').on('touchend', function(this: any){
     $(this).removeClass('taped')
     clearTimeout(timer)
 })
@@ -171,7 +176,7 @@ $('.js-addCircle').on('click', ()=>{
     mcDraw(data.addCircleOps, 'circle')
 })
 
-$sure.on('click', function(){
+$sure.on('click', function(this: any){
     let ops = $(this).data('ops')
     let type = $(this).data('type')
     mcDraw(ops, type)
@@ -183,7 +188,7 @@ function mcDraw(ops, type){
         case `image`:
             img = new Image()
             img.crossOrigin = '*'
-            img.onload = function(){
+            img.onload = () => {
                 mc.add(img, ops.options).draw({
                     type:'jpg',
                     quality:.9,
@@ -280,7 +285,7 @@ function showDialog(type, ops){
     $dialog.show()
 }
 
-$(window).on('input', '.js-input', function(){
+$(window).on('input', '.js-input', function(this: any){
     let $this = $(this)
     let v = $this.val()
     let type = $this.data('type')
@@ -309,14 +314,14 @@ $(window).on('input', '.js-input', function(){
     $sure.data('ops', JSON.stringify(ops))
 })
 
-$(window).on('focus', '.js-input', function(){
+$(window).on('focus', '.js-input', function(this: any){
     $(this).addClass('focus')
 })
-$(window).on('blur', '.js-input', function(){
+$(window).on('blur', '.js-input', function(this: any){
     $(this).removeClass('focus')
 })
 
-$(window).on('change', '.js-select', function(){
+$(window).on('change', '.js-select', function(this: any){
     let ops = $sure.data('ops')
     let type = $(this).data('type')
     ops.options[type] = $(this).val()
