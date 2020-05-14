@@ -8,15 +8,16 @@ import {
     isIos8,
     TGetSizeImage, 
     deepCopy,
-    forin
-} from './utils'
+    forin,
+    transValue,
+} from '../utils'
 
 export class MComposer {
-    private ops: Required<MCanvas.options>
+    private ops: Required<TComposer.options>
     private canvas: HTMLCanvasElement
     private ctx: CanvasRenderingContext2D
     // 绘制函数队列；
-    private queue: MCanvas.queue = []
+    private queue: TComposer.queue = []
     // 回调函数池；
     private fn = {
         // 最后执行的函数；
@@ -24,7 +25,7 @@ export class MComposer {
         // 错误回调；
         error(err){},
     }
-    private data: MCanvas.data = {
+    private data: TComposer.data = {
         // 文字id；
         textId: 0,
         // 文字绘制数据；
@@ -32,7 +33,7 @@ export class MComposer {
         // 背景图数据;
         bgConfig: null,
     }
-    constructor(options: MCanvas.options = {}) {
+    constructor(options: TComposer.options = {}) {
         // 配置canvas初始大小；
         // width：画布宽度，Number,选填，默认为 500;
         // height: 画布高度，Number，选填，默认与宽度一致；
@@ -58,7 +59,7 @@ export class MComposer {
     // --------------------------------------------------------
     // 绘制背景部分；
     // --------------------------------------------------------
-    public background(image?, bg: MCanvas.backgroundOptions = { type : 'origin' }){
+    public background(image?, bg: TComposer.backgroundOptions = { type : 'origin' }){
         if(!image && !this.data.bgConfig) {
             throwError('the init background must has a image.')
             return this
@@ -86,7 +87,7 @@ export class MComposer {
     }
 
     private _getBgAlign(
-        left: MCanvas.backgroundOptions['left'], 
+        left: TComposer.backgroundOptions['left'], 
         iw: number, 
         cw: number, 
         cropScale: number
@@ -108,7 +109,7 @@ export class MComposer {
         return rv
     }
     
-    private _background(img: HTMLImageElement, bg: MCanvas.backgroundOptions) {
+    private _background(img: HTMLImageElement, bg: TComposer.backgroundOptions) {
         let { iw, ih } = getSize(img)
         // 图片与canvas的长宽比；
         let iRatio = iw / ih
@@ -178,14 +179,14 @@ export class MComposer {
     // --------------------------------------------------------
 
     // 绘制矩形层；
-    public rect(ops: MCanvas.rectOptions){
+    public rect(ops: TComposer.rectOptions){
         this.queue.push(() => {
             let { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops
             let cw = this.canvas.width, ch = this.canvas.height
-            let width = this._get(cw, 0, ops.width || 0, 'pos') - 2 * strokeWidth,
-                height = this._get(ch, 0, ops.height || 0, 'pos') - 2 * strokeWidth
-            let x = this._get(cw, width, ops.x || 0, 'pos') + strokeWidth / 2,
-                y = this._get(ch, height, ops.y || 0, 'pos') + strokeWidth / 2
+            let width = transValue(cw, 0, ops.width || 0, 'pos') - 2 * strokeWidth,
+                height = transValue(ch, 0, ops.height || 0, 'pos') - 2 * strokeWidth
+            let x = transValue(cw, width, ops.x || 0, 'pos') + strokeWidth / 2,
+                y = transValue(ch, height, ops.y || 0, 'pos') + strokeWidth / 2
             this.ctx.lineWidth = strokeWidth
             this.ctx.fillStyle = fillColor
             this.ctx.strokeStyle = strokeColor
@@ -201,13 +202,13 @@ export class MComposer {
     }
 
     // 绘制圆形层；
-    public circle(ops: MCanvas.circleOptions){
+    public circle(ops: TComposer.circleOptions){
         this.queue.push(() => {
             let { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops
             let cw = this.canvas.width, ch = this.canvas.height
-            let r = this._get(cw, 0, ops.r || 0, 'pos') - 2 * strokeWidth
-            let x = this._get(cw, 2 * r, ops.x || 0, 'pos') + strokeWidth / 2 + r,
-                y = this._get(ch, 2 * r, ops.y || 0, 'pos') + strokeWidth / 2 + r
+            let r = transValue(cw, 0, ops.r || 0, 'pos') - 2 * strokeWidth
+            let x = transValue(cw, 2 * r, ops.x || 0, 'pos') + strokeWidth / 2 + r,
+                y = transValue(ch, 2 * r, ops.y || 0, 'pos') + strokeWidth / 2 + r
 
             this.ctx.beginPath()
             this.ctx.arc(x, y, r, 0, Math.PI * 2, false)
@@ -231,8 +232,8 @@ export class MComposer {
 
     // 绘制水印；基于 add 函数封装；
     public watermark(
-        image: MCanvas.image, 
-        ops: MCanvas.watermarkOptions,
+        image: TCommon.image, 
+        ops: TComposer.watermarkOptions,
     ){
         if(!image){
             throwError('there is not image of watermark.')
@@ -241,7 +242,7 @@ export class MComposer {
 
         // 参数默认值；
         const { width = '40%', pos = 'rightbottom', margin = 20 } = ops
-        const position: Required<MCanvas.position> = {
+        const position: Required<TComposer.position> = {
             x:0,
             y:0,
             scale:1,
@@ -277,11 +278,11 @@ export class MComposer {
     // 多张图: add([{image:'',options:{}},{image:'',options:{}}]);
     // 单张图: add(image,options);
     public add(
-        image: MCanvas.addData[] | string | HTMLImageElement | HTMLCanvasElement, 
-        options?: MCanvas.addOptions
+        image: TComposer.addData[] | TCommon.image, 
+        options?: TComposer.addOptions
     ) {
         // 默认参数；
-        let def = {
+        const def = {
             width:'100%',
             crop:{
                 x:0,
@@ -299,20 +300,22 @@ export class MComposer {
 
         const images = is.arr(image) ? image : [{ image, options }]
 
-        images.map( v =>{
+        images.map(v =>{
             // 将封装好的 add函数 推入队列中待执行；
             // 参数经过 _handleOps 加工；
             this.queue.push(() => {
                 getImage(v.image, img => {
-                    this._add(img, this._handleOps(img, extend(def, v.options)))
+                    this._add(
+                        img, 
+                        this._handleOps(img, extend(true, def, v.options))
+                    )
                 }, this.fn.error)
             })
         })
-
         return this
     }
 
-    private _add(img, ops: Required<MCanvas.addOptions>){
+    private _add(img, ops: Required<TComposer.addOptions>){
         const crop = ops.crop as {
             x: number,
             y: number,
@@ -342,7 +345,7 @@ export class MComposer {
         let lcvs = document.createElement('canvas')
         let lctx = lcvs.getContext('2d') as CanvasRenderingContext2D
         // 图片宽高比 * 1.4 是一个最安全的宽度，旋转任意角度都不会被裁剪；
-        // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此甚至了最高倍数为5；
+        // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此设置最高倍数为5；
         // _ratio 为 较大边 / 较小边 的比例；
         const _ratio = iw > ih ? iw / ih : ih / iw
         const lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4
@@ -352,20 +355,8 @@ export class MComposer {
         lcvs.height = Math.round(lsh * lctxScale)
 
         // 限制canvas的大小，ios8以下为 2096, 其余平台均限制为 4096;
-        let shrink
-        if(isIos8() && (lcvs.width > 2096 || lcvs.height > 2096)){
-            if(cratio > 1){
-                shrink = 2096 / lcvs.width
-            }else{
-                shrink = 2096 / lcvs.height
-            }
-        }else if(lcvs.width > 4096 || lcvs.height > 4096){
-            if(cratio > 1){
-                shrink = 4096 / lcvs.width
-            }else{
-                shrink = 4096 / lcvs.height
-            }
-        }
+        const limitLength = isIos8() && (lcvs.width > 2096 || lcvs.height > 2096) ? 2096 : 4096
+        const shrink = cratio > 1 ? limitLength / lcvs.width : limitLength / lcvs.height
 
         // 从素材canvas的中心点开始绘制；
         ldx = - Math.round(lsw / 2)
@@ -412,7 +403,7 @@ export class MComposer {
     }
 
     // 参数加工函数；
-    private _handleOps(img: TGetSizeImage, ops: Required<MCanvas.addOptions>){
+    private _handleOps(img: TGetSizeImage, ops: Required<TComposer.addOptions>){
         const cw = this.canvas.width,
             ch = this.canvas.height
         const { iw, ih } = getSize(img)
@@ -421,19 +412,19 @@ export class MComposer {
         const ratio = iw / ih
 
         // 根据参数计算后的绘制宽度；
-        const width =  this._get(cw, iw, ops.width, 'pos')
+        const width =  transValue(cw, iw, ops.width, 'pos')
 
         // 裁剪的最大宽高；
         let maxLsw, maxLsh
 
         // 裁剪参数；
-        const cropw = this._get(cw, iw, ops.crop.width, 'crop')
-        const croph = this._get(ch, ih, ops.crop.height, 'crop')
+        const cropw = transValue(cw, iw, ops.crop.width!, 'crop')
+        const croph = transValue(ch, ih, ops.crop.height!, 'crop')
         const crop = {
             width: cropw,
             height: croph,
-            x: this._get(iw, cropw, ops.crop.x, 'crop'),
-            y: this._get(ih, croph, ops.crop.y, 'crop')
+            x: transValue(iw, cropw, ops.crop.x!, 'crop'),
+            y: transValue(ih, croph, ops.crop.y!, 'crop')
         }
 
         // 最大值判定；
@@ -447,8 +438,8 @@ export class MComposer {
         // 位置参数；
         const { x: px, y: py, rotate: pr, scale: ps = 1 } = ops.pos
         const pos = {
-            x: this._get(cw, width, px, 'pos'),
-            y: this._get(ch, width / ratio, py, 'pos'),
+            x: transValue(cw, width, px!, 'pos'),
+            y: transValue(ch, width / ratio, py!, 'pos'),
             scale: ps,
             rotate: this._getRotate(pr),
         }
@@ -458,7 +449,7 @@ export class MComposer {
     // --------------------------------------------------------
     // 绘制文字部分；
     // --------------------------------------------------------
-    public text(context: string = '', ops: MCanvas.textOptions){
+    public text(context: string = '', ops: TComposer.textOptions){
         // 默认字体；
         const fontFamily = `helvetica neue,hiragino sans gb,Microsoft YaHei,arial,tahoma,sans-serif`
         // 默认的字体大小;
@@ -467,7 +458,7 @@ export class MComposer {
         this.queue.push(()=>{
             const defaultStyle = {
                 color:'#000',
-                type : 'fill',   // strokeText or fillText,
+                type : 'fill',   // stroke | fill,
                 lineWidth : 1,
                 shadow:{
                     color: null,
@@ -500,7 +491,7 @@ export class MComposer {
                     y:0,
                     rotate: 0,
                 },
-            }, ops) as Required<MCanvas.textOptions>
+            }, ops) as Required<TComposer.textOptions>
 
             // 解析字符串模板后，调用字体绘制函数；
             const parseContext = this._parse(context)
@@ -564,18 +555,20 @@ export class MComposer {
             text: string;
             size: 0 | 1 | 2;
         }[], 
-        option: Required<MCanvas.textOptions>
+        option: Required<TComposer.textOptions>
     ){
+        
         this.data.textId++
         this.data.text[this.data.textId] = {}
-
+        
         // 处理宽度参数；
-        option.width = this._get(this.canvas.width, 0, option.width, 'pos')
-
+        option.width = transValue(this.canvas.width, 0, option.width, 'pos') as number
+        const opsWidth = option.width 
+        
         let style, line = 1, length = 0,
             lineHeight = getLineHeight(textArr, option),
-            x = this._get(this.canvas.width, option.width, 0, 'pos'),
-            y = (this._get(this.canvas.height, 0, 0, 'pos')) + lineHeight
+            x = transValue(this.canvas.width, opsWidth, 0, 'pos'),
+            y = (transValue(this.canvas.height, 0, 0, 'pos')) + lineHeight
 
         // data:字体数据；
         // lineWidth:行宽；
@@ -594,15 +587,15 @@ export class MComposer {
             const context = v.text.replace(/<br>/g, '|')
 
             // 先进行多字超出判断，超出宽度后再进行单字超出判断；
-            if((length + width) > option.width || context.indexOf('|') !== -1){
+            if((length + width) > opsWidth || context.indexOf('|') !== -1){
                 for (let i = 0, fontLength = context.length; i < fontLength; i++) {
                     let font = context[i]
                     width = this.ctx.measureText(font).width
 
                     // 当字体的计算宽度 > 设置的宽度 || 内容中包含换行时,进入换行逻辑；
-                    if((length + width) > option.width || font === '|'){
+                    if((length + width) > opsWidth || font === '|'){
                         length = 0
-                        x = this._get(this.canvas.width, option.width, 0, 'pos')
+                        x = transValue(this.canvas.width, opsWidth, 0, 'pos')
                         y += lineHeight
                         line += 1
                         this.data.text[this.data.textId][line] = {
@@ -629,11 +622,10 @@ export class MComposer {
         })
 
         // 创建文字画布；
-        const opsWidth = option.width as number
         const tcvs = document.createElement('canvas')
         const tctx = tcvs.getContext('2d')
-        const tdx = this._get(this.canvas.width, opsWidth, option.pos.x, 'pos'),
-            tdy = this._get(this.canvas.height, 0, option.pos.y, 'pos')
+        const tdx = transValue(this.canvas.width, opsWidth, option.pos.x as number, 'pos'),
+            tdy = transValue(this.canvas.height, 0, option.pos.y as number, 'pos')
         let tdw, tdh
         tdw = tcvs.width = opsWidth
         tdh = tcvs.height = this._getTextRectHeight(line)
@@ -718,73 +710,35 @@ export class MComposer {
         return lastLineData.y + lastLineData.style.lineHeight
     }
 
-    // --------------------------------------------------------
-    // 业务功能函数部分
-    // --------------------------------------------------------
-
-    // 参数加工函数；
-    // 兼容 5 种 value 值：
-    // x:250, x:'250px', x:'100%', x:'left:250',x:'center',
-    // width:100,width:'100px',width:'100%'
-    private _get(par, child, str, type){
-        let result = str
-        if(typeof str === 'string'){
-            if(str.indexOf(':') !== -1 && type === 'pos'){
-                let arr = str.split(':')
-                switch (arr[0]) {
-                    case 'left':
-                    case 'top':
-                        result = +(arr[1].replace('px', ''))
-                        break
-                    case 'right':
-                    case 'bottom':
-                        result = par - (+(arr[1].replace('px', ''))) - child
-                        break
-                    default:
-                }
-            } else if (str.indexOf('px') !== -1) {
-                result = (+str.replace('px', ''))
-            } else if (str.indexOf('%') !== -1) {
-                if(type === 'crop'){
-                    result = child * (+str.replace('%', '')) / 100
-                }else{
-                    result = par * (+str.replace('%', '')) / 100
-                }
-            } else if (str === 'center'){
-                result = (par - child) / 2
-            } else if (str === 'origin') {
-                result = child
-            } else {
-                result = +str
-            }
-        }
-        return Math.round(result)
-    }
-
     // 绘制函数；
-    public draw(ops: MCanvas.drawOptions | ((b64: string) => void)){
-        let _ops = {
-            type: 'jpeg',
-            quality: .9,
-            success(b64){},
-            error(err){},
-        }, b64
-
-        if(is.fn(ops)){
-            _ops.success = ops
-        }else{
-            _ops = extend(_ops, ops)
-            if(_ops.type === 'jpg') _ops.type = 'jpeg'
-        }
-        this.fn.error = _ops.error
-        this.fn.success = () => {
-            setTimeout(()=>{
-                b64 = this.canvas.toDataURL(`image/${_ops.type}`, _ops.quality)
-                _ops.success(b64)
-            }, 0)
-        }
-        this._next()
-        return this
+    public draw(ops: TCommon.drawOptions | ((b64: string) => void)){
+        return new Promise((resolve, reject) => {
+            let _ops = {
+                type: 'jpeg',
+                quality: .9,
+                success(b64){},
+                error(err){},
+            }, b64
+    
+            if(is.fn(ops)){
+                _ops.success = ops
+            }else{
+                _ops = extend(_ops, ops)
+                if(_ops.type === 'jpg') _ops.type = 'jpeg'
+            }
+            this.fn.error = (err) => {
+                _ops.error(err)
+                reject(err)
+            }
+            this.fn.success = () => {
+                setTimeout(()=>{
+                    b64 = this.canvas.toDataURL(`image/${_ops.type}`, _ops.quality)
+                    _ops.success(b64)
+                    resolve(b64)
+                }, 0)
+            }
+            this._next()
+        })
     }
 
     private _next(){

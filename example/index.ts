@@ -1,19 +1,30 @@
-import { MComposer } from '../src/index'
+import { MComposer, MCrop } from '../src/index'
 import ear from './images/ear.png'
 import watermark from './images/watermark.jpg'
 
 import './main.scss'
 
-// import { MCrop } from '../lib/index'
-
+const mcrop = new MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
+    x: 0,
+    y: 0,
+    width: 200,
+    height: 200,
+    radius: 150,
+})
+mcrop.draw({
+    success(b64) {
+        console.log(b64)
+        $('#img111').attr('src', b64)
+    }
+})
 // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 //     type: 'rect',
-//     x: 'center',
-//     y: 100,
-//     width: 300,
+//     x: 0,
+//     y: 0,
+//     width: 690,
 //     height: 300,
 //     success(b64) {
-//         document.querySelector('#img111').src = b64
+//         $('#img111').attr('src', b64)
 //     },
 // })
 // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
@@ -22,7 +33,7 @@ import './main.scss'
 //     y: '0',
 //     r: 200,
 //     success(b64) {
-//         document.querySelector('#img111').src = b64
+//         $('#img111').attr('src', b64)
 //     },
 // })
 
@@ -188,18 +199,13 @@ function mcDraw(ops, type){
         case `image`:
             img = new Image()
             img.crossOrigin = '*'
-            img.onload = () => {
-                mc.add(img, ops.options).draw({
+            img.onload = async () => {
+                const b64 = await mc.add(img, ops.options).draw({
                     type:'jpg',
                     quality:.9,
-                    success(b64){
-                        $result.attr('src', b64)
-                        $dialog.hide()
-                    },
-                    error(err){
-                        console.log('error', err)
-                    },
                 })
+                $result.attr('src', b64)
+                $dialog.hide()
             }
             img.src = ops.image
             break

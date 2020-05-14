@@ -1,3 +1,4 @@
+import { is } from './is'
 export { is, type } from './is'
 export { extend } from './extend'
 
@@ -62,7 +63,10 @@ function isCanvas(dom: any): dom is HTMLCanvasElement {
 
 
 export type TGetSizeImage = HTMLImageElement | HTMLCanvasElement | HTMLElement
-export function getSize(img: TGetSizeImage){
+export function getSize(img: TGetSizeImage): {
+    iw: number,
+    ih: number,
+} {
     let iw, ih
     if(isImg(img)){
         iw = img.naturalWidth
@@ -76,6 +80,73 @@ export function getSize(img: TGetSizeImage){
     }
     return { iw, ih }
 }
+
+function include(tar, value) {
+    return tar.indexOf && tar.indexOf(value) !== -1
+}
+
+// 参数加工函数；
+// 兼容 5 种 value 值：
+// x:250, x:'250px', x:'100%', x:'left:250',x:'center',
+// width:100,width:'100px',width:'100%'
+    // par: 父级尺寸
+    // child: 自身尺寸
+    // value: 值
+    // type: 不同处理方式
+export function transValue(par: number, child: number, value: number | string, type: 'pos' | 'crop'){
+    let result = value
+    if(is.str(value)){
+        if(include(value, ':') && type === 'pos'){
+            const [ _attr, _value ] = value.split(':')
+            switch (_attr) {
+                case 'left':
+                case 'top':
+                    result = +(_value.replace('px', ''))
+                    break
+                case 'right':
+                case 'bottom':
+                    result = par - (+(_value.replace('px', ''))) - child
+                    break
+            }
+        } else if (include(value, 'px')) {
+            result = (+value.replace('px', ''))
+        } else if (include(value, '%')) {
+            result = (type === 'crop' ? child : par) * (+value.replace('%', '')) / 100
+        } else if (value === 'center'){
+            result = (par - child) / 2
+        } else if (value === 'origin') {
+            result = child
+        } else {
+            result = +value
+        }
+    }
+
+    return Math.round(result as number)
+}
+
+// 获取长度
+    // imgW: 参照尺寸
+    // value: 值
+export function getLength(ref: number, value: string | number) {
+    let result = value
+    if(is.str(value)){
+        if (include(value, 'px')) {
+            result = (+value.replace('px', ''))
+        } else if (include(value, '%')) {
+            result = ref * (+value.replace('%', '')) / 100
+        } else if (value === 'center'){
+            result = ref / 2
+        } else {
+            result = +value
+        }
+    }
+    return Math.round(result as number)
+}
+
+export function Point(x: number, y: number) {
+    return { x, y }
+}
+
 
 export function throwError(msg: string) {
     throw new Error(`[MCanvas ERROR]: ${msg}`)
