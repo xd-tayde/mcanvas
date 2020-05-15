@@ -1,4 +1,5 @@
 import { 
+    include,
     extend, 
     throwError,
     getImage, 
@@ -10,7 +11,11 @@ import {
     deepCopy,
     forin,
     transValue,
+    _Promise,
+    drawRoundRect,
+    getLength,
 } from '../utils'
+import { MCrop } from './mcrop'
 
 export class MComposer {
     private ops: Required<TComposer.options>
@@ -181,20 +186,29 @@ export class MComposer {
     // 绘制矩形层；
     public rect(ops: TComposer.rectOptions){
         this.queue.push(() => {
-            let { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops
-            let cw = this.canvas.width, ch = this.canvas.height
-            let width = transValue(cw, 0, ops.width || 0, 'pos') - 2 * strokeWidth,
-                height = transValue(ch, 0, ops.height || 0, 'pos') - 2 * strokeWidth
-            let x = transValue(cw, width, ops.x || 0, 'pos') + strokeWidth / 2,
-                y = transValue(ch, height, ops.y || 0, 'pos') + strokeWidth / 2
-            this.ctx.lineWidth = strokeWidth
-            this.ctx.fillStyle = fillColor
-            this.ctx.strokeStyle = strokeColor
+            const { width: cw, height: ch } = this.canvas
+            const { 
+                fillColor = '#fff', 
+                strokeColor = fillColor, 
+                strokeWidth = 0,
+                radius = 0,
+            } = ops
+            let { width = 0, height = 0, x = 0, y = 0 } = ops
+            width = transValue(cw, 0, width, 'pos') - 2 * strokeWidth,
+            height = transValue(ch, 0, height, 'pos') - 2 * strokeWidth
 
-            this.ctx.beginPath()
-            this.ctx.strokeRect(x, y, width, height)
-            this.ctx.fillRect(x, y, width, height)
-            this.ctx.closePath()
+            x = transValue(cw, width, x, 'pos') + (include(x, 'right') ? -strokeWidth : strokeWidth)
+            y = transValue(ch, height, y, 'pos') +(include(y, 'bottom') ? -strokeWidth : strokeWidth)
+
+            drawRoundRect(
+                this.ctx, 
+                x, y, 
+                width, height, 
+                radius, 
+                fillColor,
+                strokeWidth,
+                strokeColor,
+            )
 
             this._resetCtx()._next()
         })
@@ -204,8 +218,8 @@ export class MComposer {
     // 绘制圆形层；
     public circle(ops: TComposer.circleOptions){
         this.queue.push(() => {
-            let { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops
-            let cw = this.canvas.width, ch = this.canvas.height
+            const { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops
+            const { width: cw, height: ch } = this.canvas
             let r = transValue(cw, 0, ops.r || 0, 'pos') - 2 * strokeWidth
             let x = transValue(cw, 2 * r, ops.x || 0, 'pos') + strokeWidth / 2 + r,
                 y = transValue(ch, 2 * r, ops.y || 0, 'pos') + strokeWidth / 2 + r
@@ -289,6 +303,7 @@ export class MComposer {
                 y:0,
                 width:'100%',
                 height:'100%',
+                radius: 0,
             },
             pos:{
                 x: 0,
@@ -321,6 +336,7 @@ export class MComposer {
             y: number,
             width: number,
             height: number,
+            radius: number,
         }
         const pos = ops.pos as {
             x: number,
@@ -330,20 +346,37 @@ export class MComposer {
         }
         const width = ops.width as number
 
-        if (width === 0) throwWarn(`the width of mc-element is zero`)
+        if(width === 0) throwWarn(`the width of mc-element is zero`)
 
         const { iw, ih } = getSize(img)
         // let ratio = iw / ih;
         // 画布canvas参数；
         let cdx, cdy, cdw, cdh
         // 素材canvas参数；
-        let { x: lsx, y: lsy, width: lsw, height: lsh } = crop
+        let { width: lsw, height: lsh, radius } = crop
+
+        // 图片需要裁剪
+        if (lsw !== iw || lsh !== ih || radius > 0) {
+            // 此时 img 已加载，且直接导出 canvas
+            // 因此 success 为同步代码
+            new MCrop(img, crop).draw({
+                type: 'png',
+                quality: 1,
+                exportType: 'canvas',
+                success: cvs => img = cvs
+            })
+        }
 
         const cratio = lsw / lsh
         let ldx, ldy, ldw, ldh
         // 素材canvas的绘制;
         let lcvs = document.createElement('canvas')
         let lctx = lcvs.getContext('2d') as CanvasRenderingContext2D
+
+        // 由于 canvas 的特性，旋转只是 ctx 的旋转，并不是 canvas,
+        // 因此如果 canvas 与 ctx 完全相等时，旋转就会出现被裁剪的问题
+        // 这里通过将 canvas 放大的方式来解决该问题；
+
         // 图片宽高比 * 1.4 是一个最安全的宽度，旋转任意角度都不会被裁剪；
         // 没有旋转却长宽比很高大的图，会导致放大倍数太大，因此设置最高倍数为5；
         // _ratio 为 较大边 / 较小边 的比例；
@@ -372,7 +405,7 @@ export class MComposer {
         lctx.translate(lcvs.width / 2, lcvs.height / 2)
         lctx.rotate(pos.rotate)
 
-        lctx.drawImage(img, lsx, lsy, lsw, lsh, ldx, ldy, ldw, ldh)
+        lctx.drawImage(img, ldx, ldy, ldw, ldh)
 
         cdw = Math.round(width * lctxScale)
         cdh = Math.round(cdw / cratio)
@@ -404,8 +437,7 @@ export class MComposer {
 
     // 参数加工函数；
     private _handleOps(img: TGetSizeImage, ops: Required<TComposer.addOptions>){
-        const cw = this.canvas.width,
-            ch = this.canvas.height
+        const { width: cw, height: ch } = this.canvas
         const { iw, ih } = getSize(img)
 
         // 图片宽高比；
@@ -424,7 +456,8 @@ export class MComposer {
             width: cropw,
             height: croph,
             x: transValue(iw, cropw, ops.crop.x!, 'crop'),
-            y: transValue(ih, croph, ops.crop.y!, 'crop')
+            y: transValue(ih, croph, ops.crop.y!, 'crop'),
+            radius: getLength(cropw, ops.crop.radius!),
         }
 
         // 最大值判定；
@@ -432,8 +465,8 @@ export class MComposer {
         if (crop.y > ih) crop.y = ih
         maxLsw = iw - crop.x
         maxLsh = ih - crop.y
-        if(crop.width > maxLsw)crop.width = maxLsw
-        if(crop.height > maxLsh)crop.height = maxLsh
+        if(crop.width > maxLsw) crop.width = maxLsw
+        if(crop.height > maxLsh) crop.height = maxLsh
 
         // 位置参数；
         const { x: px, y: py, rotate: pr, scale: ps = 1 } = ops.pos
@@ -712,30 +745,36 @@ export class MComposer {
 
     // 绘制函数；
     public draw(ops: TCommon.drawOptions | ((b64: string) => void)){
-        return new Promise((resolve, reject) => {
-            let _ops = {
+        return _Promise((resolve, reject) => {
+            let config = {
                 type: 'jpeg',
                 quality: .9,
+                exportType: 'base64',
                 success(b64){},
                 error(err){},
-            }, b64
+            }
     
             if(is.fn(ops)){
-                _ops.success = ops
+                config.success = ops
             }else{
-                _ops = extend(_ops, ops)
-                if(_ops.type === 'jpg') _ops.type = 'jpeg'
+                config = extend(true, config, ops)
+                if(config.type === 'jpg') config.type = 'jpeg'
             }
             this.fn.error = (err) => {
-                _ops.error(err)
+                config.error(err)
                 reject(err)
             }
             this.fn.success = () => {
-                setTimeout(()=>{
-                    b64 = this.canvas.toDataURL(`image/${_ops.type}`, _ops.quality)
-                    _ops.success(b64)
-                    resolve(b64)
-                }, 0)
+                if (config.exportType === 'canvas') {
+                    config.success(this.canvas)
+                    resolve(this.canvas)
+                } else {
+                    setTimeout(()=>{
+                        const b64 = this.canvas.toDataURL(`image/${config.type}`, config.quality)
+                        config.success(b64)
+                        resolve(b64)
+                    }, 0)
+                }
             }
             this._next()
         })

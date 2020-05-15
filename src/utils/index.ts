@@ -1,6 +1,7 @@
 import { is } from './is'
 export { is, type } from './is'
 export { extend } from './extend'
+export { drawRoundRect } from './draw'
 
 export function loadImage(image, loaded, error) {
     let img: null | HTMLImageElement = new Image()
@@ -81,7 +82,7 @@ export function getSize(img: TGetSizeImage): {
     return { iw, ih }
 }
 
-function include(tar, value) {
+export function include(tar, value) {
     return tar.indexOf && tar.indexOf(value) !== -1
 }
 
@@ -143,10 +144,14 @@ export function getLength(ref: number, value: string | number) {
     return Math.round(result as number)
 }
 
-export function Point(x: number, y: number) {
-    return { x, y }
+export function _Promise(fn: (resolve, reject) => void) {
+    if (window.Promise) {
+        return new Promise(fn)
+    } else {
+        throwWarn('Promise is not supported.You can use Promise polyfill or callback function.')
+        return fn(() => {}, () => {})
+    }
 }
-
 
 export function throwError(msg: string) {
     throw new Error(`[MCanvas ERROR]: ${msg}`)

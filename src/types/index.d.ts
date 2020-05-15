@@ -7,9 +7,10 @@ declare namespace TCommon {
     type numstr = number | string
     type image = string | HTMLImageElement | HTMLCanvasElement
     interface drawOptions {
-        type?: 'png' | 'jpg' | 'jpeg' | 'webp',
+        type?: 'png' | 'jpg' | 'jpeg',
         quality?: number,
-        success?: (b64: string) => void
+        exportType?: 'base64' | 'canvas',
+        success?: (b64: string | HTMLCanvasElement) => void
         error?: (err: any) => void
     }
 }
@@ -42,8 +43,9 @@ declare namespace TComposer {
     interface crop {
         x?: TCommon.numstr,
         y?: TCommon.numstr,
-        width?: TCommon.numstr
-        height?: TCommon.numstr
+        width?: TCommon.numstr,
+        height?: TCommon.numstr,
+        radius?: TCommon.numstr,
     }
     interface addOptions {
         width?: TCommon.numstr,
@@ -95,6 +97,7 @@ declare namespace TComposer {
         y?: TCommon.numstr,
         width?: TCommon.numstr,
         height?: TCommon.numstr,
+        radius?: number,
         strokeWidth?: number,
         strokeColor?: string,
         fillColor?: string,
@@ -111,24 +114,10 @@ declare namespace TComposer {
 
 declare namespace TCrop {
     interface options {
-        // 左上角坐标
         x?: number | string 
         y?: number | string
-        // type = 'rect' 时有效
         width?: number | string
         height?: number | string
-        // type = 'circle' 时有效   
         radius?: number | string
-        // exportConfig?: {
-        //     type: 'jpg' | 'png' | 'jpeg'
-        //     //  0 - 1
-        //     quality: number
-        // }
-        // // the success callback
-        // success?: (b64: string) => void
-        // error?: (err: any) => void
-    }
-    interface exportConfig {
-        
     }
 }

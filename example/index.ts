@@ -1,22 +1,28 @@
 import { MComposer, MCrop } from '../src/index'
 import ear from './images/ear.png'
 import watermark from './images/watermark.jpg'
-
+import imgTest from './images/1.jpg'
 import './main.scss'
 
-const mcrop = new MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
-    x: 0,
-    y: 0,
-    width: 200,
-    height: 200,
-    radius: 150,
-})
-mcrop.draw({
-    success(b64) {
-        console.log(b64)
-        $('#img111').attr('src', b64)
-    }
-})
+(async () => {
+    // const mcrop = new MCrop(imgTest, {
+    //     x: 192,
+    //     y: 84,
+    //     width: 365,
+    //     height: 365,
+    //     radius: 0,
+    // })
+
+    // const b64 = await mcrop.draw()
+    // console.log(b64)
+    // $('#img111').attr('src', b64)
+    // mcrop.draw({
+    //     success(b64) {
+    //         console.log(b64)
+    //         $('#img111').attr('src', b64)
+    //     }
+    // })
+})()
 // MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 //     type: 'rect',
 //     x: 0,
@@ -47,14 +53,18 @@ let $clear = $('.js-clear')
 let data = {
     addImageOps : {
         image: ear,
-        // image:'https://mtapplet.meitudata.com/59c8c479521876738.jpg',
         options:{
             width:482,
+            // crop: {
+            //     x: 192,
+            //     y: 84,
+            //     width: 365,
+            //     height: 365,
+            //     radius: '50%',
+            // },
             pos:{
-                x:150,
-                y:58,
-                scale:1,
-                rotate:1,
+                x: 150,
+                y: 50,
             },
         },
     },
@@ -70,6 +80,7 @@ let data = {
         y: 'bottom:0',
         width: '100%',
         height: 300,
+        radius: 30,
         strokeWidth : 5,
         strokeColor: '#996699',
         fillColor: 'rgba(0,0,0,.5)',
