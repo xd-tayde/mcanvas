@@ -1,6 +1,7 @@
-import { MComposer } from './modules/mcomposer'
-export { MComposer } from './modules/mcomposer'
+import { MCompose } from './modules/mcompose'
+export { MCompose } from './modules/mcompose'
 export { MCrop } from './modules/mcrop'
+export { MFilter } from './modules/mfilter'
 
-export default MComposer
+export default MCompose
 console.log('start')

@@ -2,7 +2,6 @@ import {
     getImage, 
     getSize, 
     getLength, 
-    throwError, 
     extend, 
     transValue,
     _Promise,
@@ -44,7 +43,7 @@ export class MCrop {
                 config.success = exportConfig
             } else {
                 config = extend(true, config, exportConfig) 
-                if(config.type === 'jpg') config.type = 'jpeg'
+                if (config.type === 'jpg') config.type = 'jpeg'
             }
 
             const success = (result) => {
@@ -79,7 +78,7 @@ export class MCrop {
                         success(this.cvs)
                     } else {
                         if (radius > 0) config.type = 'png'
-                        setTimeout(()=>{
+                        setTimeout(() => {
                             const b64 = this.cvs.toDataURL(`image/${config.type}`, config.quality)
                             success(b64)
                         }, 0)

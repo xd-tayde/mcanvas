@@ -1,11 +1,17 @@
 {
-    "extends": [
-        "tslint:recommended"
-    ],
     "linterOptions": {
         "exclude": [
             "node_modules/**/*.ts"
         ]
+    },
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {
+        "semicolon": [true, "never"],
+        "no-console": false,
+        "quotemark": false,
+        "eofline": false
     },
     "rules": {
         "semicolon": [
@@ -19,6 +25,7 @@
         "no-var-requires": false,
         "no-console": false,
         "jsx-no-lambda": false,
+        "jsx-boolean-value":false,
         "no-shadowed-variable": false,
         "curly": [true, "ignore-same-line"],
         "interface-over-type-literal": false,
@@ -26,9 +33,8 @@
         "no-empty": false,
         "max-classes-per-file": false,
         "prefer-for-of": false,
-        "no-unused-expression": [true, "allow-fast-null-checks"],
+        "no-unused-expression": false,
         "member-ordering":[false],
-        "jsx-boolean-value":false,
         "prefer-const": false,
         "max-line-length": false,
         "no-namespace": false,
@@ -36,10 +42,18 @@
         "quotemark": false,
         "radix": false,
         "no-trailing-whitespace": false,
-        "one-variable-per-declaration": false
-    },
-    "jsRules": {
-        "object-literal-sort-keys": false,
-        "jsx-no-lambda": false
+        "one-variable-per-declaration": false,
+        "whitespace": [true, 
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-module",
+            "check-separator",
+            "check-rest-spread",
+            "check-type",
+            "check-typecast",
+            "check-type-operator",
+            "check-preblock"
+        ]
     }
 }

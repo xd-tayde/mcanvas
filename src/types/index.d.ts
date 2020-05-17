@@ -121,3 +121,10 @@ declare namespace TCrop {
         radius?: number | string
     }
 }
+
+declare namespace TFilter {
+    interface options {
+        type: 'blur' 
+        value: number
+    }
+}

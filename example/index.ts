@@ -1,10 +1,12 @@
-import { MComposer, MCrop } from '../src/index'
+import { MCompose, MCrop, MFilter } from '../src/index'
 import ear from './images/ear.png'
 import watermark from './images/watermark.jpg'
 import imgTest from './images/1.jpg'
 import './main.scss'
 
 (async () => {
+    const b64 = await new MFilter(imgTest).gray().flip().blur().draw()
+    $('#img111').attr('src', b64)
     // const mcrop = new MCrop(imgTest, {
     //     x: 192,
     //     y: 84,
@@ -53,8 +55,8 @@ let $clear = $('.js-clear')
 let data = {
     addImageOps : {
         image: ear,
-        options:{
-            width:482,
+        options: {
+            width: 482,
             // crop: {
             //     x: 192,
             //     y: 84,
@@ -62,20 +64,22 @@ let data = {
             //     height: 365,
             //     radius: '50%',
             // },
-            pos:{
+            pos: {
                 x: 150,
                 y: 50,
+                scale: 1,
+                rotate: 0,
             },
         },
     },
     addWmOps : {
         image: watermark,
-        options:{
-            width:'40%',
-            pos:'rightBottom',
+        options: {
+            width: '40%',
+            pos: 'rightBottom',
         },
     },
-    addRectOps:{
+    addRectOps: {
         x: 0,
         y: 'bottom:0',
         width: '100%',
@@ -85,7 +89,7 @@ let data = {
         strokeColor: '#996699',
         fillColor: 'rgba(0,0,0,.5)',
     },
-    addCircleOps:{
+    addCircleOps: {
         x: 'center',
         y: 'center',
         r: 100,
@@ -95,20 +99,20 @@ let data = {
     },
     addTextOps : {
         // text:'<b>A</b>BBBBB<s>MCanvas.js</s>',
-        text:'<b>Large/Stroke</b><br>Normal/Gradient<br><s>Small/Shadow</s>',
-        options:{
-            width:'600',
-            align:'center',
-            largeStyle:{
-                color:'red',
+        text: '<b>Large/Stroke</b><br>Normal/Gradient<br><s>Small/Shadow</s>',
+        options: {
+            width: '600',
+            align: 'center',
+            largeStyle: {
+                color: 'red',
                 font: '90px Microsoft YaHei,sans-serif',
                 type: 'stroke',
                 lineWidth: 2,
                 lineHeight : 90,
             },
-            normalStyle:{
-                color:'blue',
-                font:'70px Microsoft YaHei,sans-serif',
+            normalStyle: {
+                color: 'blue',
+                font: '70px Microsoft YaHei,sans-serif',
                 lineHeight : 70,
                 // shadow:{
                 //     color: 'red',
@@ -116,95 +120,95 @@ let data = {
                 //     offsetX: 2,
                 //     offsetY: 2,
                 // },
-                gradient:{
+                gradient: {
                     type: 2,  // 1: 横向渐变； 2: 纵向渐变；
                     colorStop: ['red', 'blue'],
                 },
             },
-            smallStyle:{
-                color:'yellow',
-                font:'50px Microsoft YaHei,sans-serif',
+            smallStyle: {
+                color: 'yellow',
+                font: '50px Microsoft YaHei,sans-serif',
                 lineHeight : 50,
-                shadow:{
+                shadow: {
                     color: 'red',
                     blur: 10,
                     offsetX: 5,
                     offsetY: 5,
                 },
             },
-            pos:{
-                x:'center',
-                y:'bottom:400',
+            pos: {
+                x: 'center',
+                y: 'bottom',
                 rotate: 0,
             },
         },
     },
 }
-let mc = new MComposer({
+let mc = new MCompose({
     width: 1000,
     height: 1500,
     // backgroundColor: 'black',
 })
 mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
 // mc.background('http://mtapplet.meitudata.com/59e8765b6492c541.jpg',{
-    type:'origin',
-    left:'50%',
-    top:'50%',
+    type: 'origin',
+    left: '50%',
+    top: '50%',
 })
 
 let timer
-$('.Button').on('touchstart', function(this: any){
+$('.Button').on('touchstart', function(this: any) {
     $(this).addClass('taped')
-    timer = setTimeout(()=>{
+    timer = setTimeout(() => {
         $(this).removeClass('taped')
     }, 2000)
 })
-$('.Button').on('touchend', function(this: any){
+$('.Button').on('touchend', function(this: any) {
     $(this).removeClass('taped')
     clearTimeout(timer)
 })
 
-$cancel.on('click', ()=>{
+$cancel.on('click', () => {
     $dialog.hide()
 })
 
-$clear.on('click', ()=>{
+$clear.on('click', () => {
     // mc.clear();
-    mc.background().clear().draw(b64=>{
+    mc.background().clear().draw(b64 => {
         $result.attr('src', b64)
     })
 })
 
-$('.js-addImage').on('click', ()=>{
+$('.js-addImage').on('click', () => {
     let type = `image`
     showDialog(type, data.addImageOps)
 })
 
-$('.js-addWm').on('click', ()=>{
+$('.js-addWm').on('click', () => {
     let type = `watermark`
     showDialog(type, data.addWmOps)
 })
 
-$('.js-addText').on('click', ()=>{
+$('.js-addText').on('click', () => {
     let type = `text`
     showDialog(type, data.addTextOps)
 })
 
-$('.js-addRect').on('click', ()=>{
+$('.js-addRect').on('click', () => {
     mcDraw(data.addRectOps, 'rect')
 })
 
-$('.js-addCircle').on('click', ()=>{
+$('.js-addCircle').on('click', () => {
     mcDraw(data.addCircleOps, 'circle')
 })
 
-$sure.on('click', function(this: any){
+$sure.on('click', function(this: any) {
     let ops = $(this).data('ops')
     let type = $(this).data('type')
     mcDraw(ops, type)
 })
 
-function mcDraw(ops, type){
+function mcDraw(ops, type) {
     let img
     switch (type) {
         case `image`:
@@ -212,8 +216,8 @@ function mcDraw(ops, type){
             img.crossOrigin = '*'
             img.onload = async () => {
                 const b64 = await mc.add(img, ops.options).draw({
-                    type:'jpg',
-                    quality:.9,
+                    type: 'jpg',
+                    quality: .9,
                 })
                 $result.attr('src', b64)
                 $dialog.hide()
@@ -221,25 +225,25 @@ function mcDraw(ops, type){
             img.src = ops.image
             break
         case `watermark`:
-            mc.watermark(ops.image, ops.options).draw(b64=>{
+            mc.watermark(ops.image, ops.options).draw(b64 => {
                 $result.attr('src', b64)
                 $dialog.hide()
             })
             break
         case `text`:
-            mc.text(ops.text, ops.options).draw(b64=>{
+            mc.text(ops.text, ops.options).draw(b64 => {
                 $result.attr('src', b64)
                 $dialog.hide()
             })
             break
         case `rect`:
-            mc.rect(ops).draw(b64=>{
+            mc.rect(ops).draw(b64 => {
                 $result.attr('src', b64)
                 $dialog.hide()
             })
             break
         case `circle`:
-            mc.circle(ops).draw(b64=>{
+            mc.circle(ops).draw(b64 => {
                 $result.attr('src', b64)
                 $dialog.hide()
             })
@@ -249,7 +253,7 @@ function mcDraw(ops, type){
 
 }
 
-function showDialog(type, ops){
+function showDialog(type, ops) {
     let tab = `&nbsp;&nbsp;&nbsp;&nbsp;`
     let html
     switch (type) {
@@ -302,7 +306,7 @@ function showDialog(type, ops){
     $dialog.show()
 }
 
-$(window).on('input', '.js-input', function(this: any){
+$(window).on('input', '.js-input', function(this: any) {
     let $this = $(this)
     let v = $this.val()
     let type = $this.data('type')
@@ -331,14 +335,14 @@ $(window).on('input', '.js-input', function(this: any){
     $sure.data('ops', JSON.stringify(ops))
 })
 
-$(window).on('focus', '.js-input', function(this: any){
+$(window).on('focus', '.js-input', function(this: any) {
     $(this).addClass('focus')
 })
-$(window).on('blur', '.js-input', function(this: any){
+$(window).on('blur', '.js-input', function(this: any) {
     $(this).removeClass('focus')
 })
 
-$(window).on('change', '.js-select', function(this: any){
+$(window).on('change', '.js-select', function(this: any) {
     let ops = $sure.data('ops')
     let type = $(this).data('type')
     ops.options[type] = $(this).val()

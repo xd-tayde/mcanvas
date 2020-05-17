@@ -6,6 +6,11 @@
         - 优化 `mc.rect`，新增 radius；
         - 优化 `mc.add.crop`， 新增 radius;
         - `mc.draw` 方法新增 exportConfig： 'base64' | 'canvas' 配置导出格式；
+    - 抽离 Queue 类；
+    - 新增 MFilter 滤镜器：
+        - 高斯模糊；
+        - 翻转；
+        - 灰白；
 
 - 1.3.9 (2019-5-10)
     - 优化文档；
