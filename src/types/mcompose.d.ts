@@ -1,20 +1,3 @@
-type checkObject<T> = T extends string | number | undefined | null | Function | never ? never : T
-declare type DeepRequired<T> = {
-    [P in keyof T]-?: checkObject<T[P]> extends never ? T[P] : DeepRequired<T[P]>;
-}
-
-declare namespace TCommon {
-    type numstr = number | string
-    type image = string | HTMLImageElement | HTMLCanvasElement
-    interface drawOptions {
-        type?: 'png' | 'jpg' | 'jpeg',
-        quality?: number,
-        exportType?: 'base64' | 'canvas',
-        success?: (b64: string | HTMLCanvasElement) => void
-        error?: (err: any) => void
-    }
-}
-
 declare namespace TComposer {
     interface options {
         width?: number,
@@ -65,7 +48,7 @@ declare namespace TComposer {
     interface textStyle {
         font?: string,
         color?: string,
-        lineheight?: number,
+        lineHeight?: number,
         type?: 'fill' | 'stroke',
         lineWidth?: number,
         shadow?: {
@@ -105,26 +88,9 @@ declare namespace TComposer {
     interface circleOptions {
         x?: TCommon.numstr,
         y?: TCommon.numstr,
-        r?: TCommon.numstr,
+        radius?: TCommon.numstr,
         strokeWidth?: number,
         strokeColor?: string,
         fillColor?: string,
-    }
-}
-
-declare namespace TCrop {
-    interface options {
-        x?: number | string 
-        y?: number | string
-        width?: number | string
-        height?: number | string
-        radius?: number | string
-    }
-}
-
-declare namespace TFilter {
-    interface options {
-        type: 'blur' 
-        value: number
     }
 }

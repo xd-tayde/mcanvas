@@ -69,4 +69,7 @@ export const is = {
     NaN(tar: any): boolean {
         return type(tar) === 'NaN'
     },
+    promise(tar: any): tar is Promise<any> {
+        return !!tar && (is.obj(tar) || is.fn(tar)) && is.fn(tar['then'])
+    }
 }

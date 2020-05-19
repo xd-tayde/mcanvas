@@ -10,17 +10,16 @@
         "watermark",
         "cropper"
     ],
-    "main": "dist/mcanvas.js",
-    "module": "dist/mcanvas.es.js",
+    "main": "dist/mcanvas.node.js",
+    "broswer": "dist/mcanvas.web.js",
     "moduleName": "MCanvas",
+    "type": "src/lib.d.ts",
     "scripts": {
-        "dev:server": "NODE_ENV=development webpack -w --config build/webpack.server.js",
-        "dev:client": "NODE_ENV=development webpack-dev-server --config build/webpack.dev.js",
-        "build:server": "NODE_ENV=production webpack -p --config build/webpack.server.js",
-        "build:client": "NODE_ENV=production webpack -p --config build/webpack.publish.js",
-        "build": "rm -rf dist && npm-run-all --parallel build:server build:client",
-        "publish:client": "cd client && npm publish",
-        "publish:server": "cd server && npm publish"
+        "dev:web": "NODE_ENV=development ENV=web webpack-dev-server --config build/webpack.example.js",
+        "dev:node": "NODE_ENV=development ENV=node webpack -w --config build/webpack.example.js",
+        "build:web": "NODE_ENV=production ENV=web webpack -p --config build/webpack.build.js",
+        "build:node": "NODE_ENV=production ENV=node webpack -p --config build/webpack.build.js",
+        "build": "rm -rf dist && npm-run-all --parallel build:node build:web"
     },
     "author": "gxd(159042708@qq.com)",
     "license": "MIT",
@@ -29,21 +28,28 @@
         "type": "git"
     },
     "devDependencies": {
+        "@types/zepto": "^1.0.30",
         "@typescript-eslint/eslint-plugin": "^2.33.0",
         "@typescript-eslint/parser": "^2.33.0",
+        "babel-eslint": "^10.1.0",
+        "babel-polyfill": "^6.26.0",
         "clean-webpack-plugin": "^3.0.0",
         "css-loader": "^3.5.1",
         "electron-rebuild": "^1.10.1",
         "eslint": "^7.0.0",
         "file-loader": "^6.0.0",
         "html-webpack-plugin": "^4.0.4",
+        "i": "^0.3.6",
         "node-sass": "^4.13.1",
         "nodemon": "^2.0.3",
+        "npm": "^6.14.5",
         "npm-run-all": "^4.1.5",
+        "promise-polyfill": "^8.1.3",
         "sass-loader": "^8.0.2",
         "style-loader": "^1.1.3",
         "ts-loader": "^6.2.2",
         "ts-node": "^8.10.1",
+        "tslint": "^6.1.2",
         "typescript": "^3.9.2",
         "url-loader": "^4.1.0",
         "webpack": "^4.42.1",
@@ -54,10 +60,7 @@
         "webpack-shell-plugin": "^0.5.0"
     },
     "dependencies": {
-        "@types/zepto": "^1.0.30",
-        "babel-eslint": "^10.1.0",
-        "i": "^0.3.6",
-        "npm": "^6.14.5",
-        "tslint": "^6.1.2"
+        "canvas": "^2.6.1",
+        "node-loader": "^0.6.0"
     }
 }

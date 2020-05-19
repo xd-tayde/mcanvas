@@ -1,19 +1,19 @@
-import { MCompose, MCrop, MFilter } from '../src/index'
+import { MCompose, MImage } from '../src/index'
 import ear from './images/ear.png'
 import watermark from './images/watermark.jpg'
 import imgTest from './images/1.jpg'
 import './main.scss'
 
 (async () => {
-    const b64 = await new MFilter(imgTest).gray().flip().blur().draw()
-    $('#img111').attr('src', b64)
-    // const mcrop = new MCrop(imgTest, {
-    //     x: 192,
-    //     y: 84,
-    //     width: 365,
-    //     height: 365,
+    // const mc = new MImage(imgTest)
+    // const b64 = await mc.crop({
+    //     x: 100,
+    //     y: 100,
+    //     width: 300,
+    //     height: 300,
     //     radius: 0,
-    // })
+    // }).filter('blur').draw()
+    // $('#img111').attr('src', b64)
 
     // const b64 = await mcrop.draw()
     // console.log(b64)

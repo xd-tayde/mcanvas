@@ -2,7 +2,6 @@ import {
     include,
     extend, 
     throwError,
-    getImage, 
     getSize, 
     is, 
     throwWarn, 
@@ -10,11 +9,10 @@ import {
     TGetSizeImage, 
     forin,
     transValue,
-    _Promise,
-    drawRoundRect,
     getLength,
-} from '../utils'
-import { MCrop } from './mcrop'
+} from '@Src/utils'
+import { Canvas } from '@Src/canvas'
+import { crop as cropFn } from '@Src/utils/crop'
 
 export class MCompose {
     private ops: Required<TComposer.options>
@@ -51,12 +49,8 @@ export class MCompose {
     }
 
     private _init() {
-        const { width, height, backgroundColor } = this.ops
-        this.cvs = document.createElement('canvas')
-        this.cvs.width = width
-        this.cvs.height = height
-        this.ctx = this.cvs.getContext('2d') as CanvasRenderingContext2D
-
+        const { width, height, backgroundColor } = this.ops;
+        [this.cvs, this.ctx] = Canvas.create(width, height)
         backgroundColor && this._setBgColor(backgroundColor)
     }
 
@@ -79,7 +73,7 @@ export class MCompose {
     
         this.queue.push(() => {
             if (bg.color) this._setBgColor(bg.color)
-            getImage(bg.image, img => this._background(img, bg), this.fn.error)
+            Canvas.getImage(bg.image, img => this._background(img, bg), this.fn.error)
         })
         return this
     }
@@ -183,7 +177,7 @@ export class MCompose {
     // --------------------------------------------------------
 
     // 绘制矩形层；
-    public rect(ops: TComposer.rectOptions) {
+    public rect(ops: TComposer.rectOptions = {}) {
         this.queue.push(() => {
             const { width: cw, height: ch } = this.cvs
             const { 
@@ -192,7 +186,7 @@ export class MCompose {
                 strokeWidth = 0,
                 radius = 0,
             } = ops
-            let { width = 0, height = 0, x = 0, y = 0 } = ops
+            let { width = 100, height = 100, x = 0, y = 0 } = ops
             width = transValue(cw, 0, width, 'pos') - 2 * strokeWidth,
             height = transValue(ch, 0, height, 'pos') - 2 * strokeWidth
 
@@ -200,7 +194,7 @@ export class MCompose {
             x = transValue(cw, width, x, 'pos') + (include(x, 'right') ? -strokeWidth : strokeWidth)
             y = transValue(ch, height, y, 'pos') + (include(y, 'bottom') ? -strokeWidth : strokeWidth)
 
-            drawRoundRect(
+            Canvas.drawRoundRect(
                 this.ctx, 
                 x, y, 
                 width, height, 
@@ -216,12 +210,12 @@ export class MCompose {
     }
 
     // 绘制圆形层；
-    public circle(ops: TComposer.circleOptions) {
+    public circle(ops: TComposer.circleOptions = {}) {
         this.queue.push(() => {
             const { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops
             const { width: cw, height: ch } = this.cvs
-            const r = transValue(cw, 0, ops.r || 0, 'pos') - 2 * strokeWidth
-            let { x = 0, y = 0 } = ops
+            let { x = 0, y = 0, radius = 100 } = ops
+            const r = transValue(cw, 0, radius, 'pos') - 2 * strokeWidth
             x = transValue(cw, 2 * r, x, 'pos') + r + (include(x, 'right') ? -strokeWidth : strokeWidth)
             y = transValue(ch, 2 * r, y, 'pos') + r + (include(y, 'bottom') ? -strokeWidth : strokeWidth)
 
@@ -248,7 +242,7 @@ export class MCompose {
     // 绘制水印；基于 add 函数封装；
     public watermark(
         image: TCommon.image, 
-        ops: TComposer.watermarkOptions,
+        ops: TComposer.watermarkOptions = {},
     ) {
         if (!image) {
             throwError('there is not image of watermark.')
@@ -319,7 +313,7 @@ export class MCompose {
             // 将封装好的 add函数 推入队列中待执行；
             // 参数经过 _handleOps 加工；
             this.queue.push(() => {
-                getImage(image, img => {
+                Canvas.getImage(image, img => {
                     this._add(
                         img, 
                         this._handleOps(img, extend(true, def, options))
@@ -358,19 +352,11 @@ export class MCompose {
         if (lsw !== iw || lsh !== ih || radius > 0) {
             // 此时 img 已加载，且直接导出 canvas
             // 因此 success 为同步代码
-            new MCrop(img, crop).draw({
-                type: 'png',
-                quality: 1,
-                exportType: 'canvas',
-                success: cvs => img = cvs
-            })
+            img = cropFn(img, crop).cvs
         }
 
         const cratio = lsw / lsh
         let ldx, ldy, ldw, ldh
-        // 素材canvas的绘制;
-        let lcvs = document.createElement('canvas')
-        let lctx = lcvs.getContext('2d') as CanvasRenderingContext2D
 
         // 由于 canvas 的特性，旋转只是 ctx 的旋转，并不是 canvas,
         // 因此如果 canvas 与 ctx 完全相等时，旋转就会出现被裁剪的问题
@@ -383,8 +369,11 @@ export class MCompose {
         const lctxScale = _ratio * 1.4 > 5 ? 5 : _ratio * 1.4
         let spaceX, spaceY
 
-        lcvs.width =  Math.round(lsw * lctxScale)
-        lcvs.height = Math.round(lsh * lctxScale)
+        // 素材canvas的绘制;
+        const [lcvs, lctx] = Canvas.create(
+            Math.round(lsw * lctxScale), 
+            Math.round(lsh * lctxScale)
+        )
 
         // 限制canvas的大小，ios8以下为 2096, 其余平台均限制为 4096;
         const limitLength = belowIOS8() && (lcvs.width > 2096 || lcvs.height > 2096) ? 2096 : 4096
@@ -497,7 +486,7 @@ export class MCompose {
             },
         }
     }
-    public text(context: string = '', ops: TComposer.textOptions) {
+    public text(context: string, ops: TComposer.textOptions = {}) {
         // 默认的字体大小;
         const dfs = this.cvs.width / 20
 
@@ -516,7 +505,7 @@ export class MCompose {
             }, ops) as Required<TComposer.textOptions>
 
             // 解析字符串模板后，调用字体绘制函数；
-            const parseContext = this._parse(context)
+            const parseContext = this._parse(String(context))
             let max = 0, maxFont
             parseContext.map(v => {
                 if (v.size > max) {
@@ -646,10 +635,9 @@ export class MCompose {
         })
 
         // 创建文字画布；
-        const tcvs = document.createElement('canvas')
-        const tctx = tcvs.getContext('2d')
-        const tdh = tcvs.height = this._getTextRectHeight(line)
-        const tdw = tcvs.width = opsWidth
+        const [tcvs, tctx] = Canvas.create(opsWidth, this._getTextRectHeight(line))
+        const tdh = tcvs.height
+        const tdw = tcvs.width
         const tdx = transValue(this.cvs.width, tdw, option.pos.x!, 'pos')
         const tdy = transValue(this.cvs.height, tdh, option.pos.y!, 'pos')
 
@@ -735,8 +723,8 @@ export class MCompose {
     }
 
     // 绘制函数；
-    public draw(ops: TCommon.drawOptions | ((b64: string) => void)) {
-        return _Promise((resolve, reject) => {
+    public draw(ops: TCommon.drawOptions | ((b64: string) => void) = {}) {
+        return new Promise((resolve, reject) => {
             let config = {
                 type: 'jpeg',
                 quality: .9,

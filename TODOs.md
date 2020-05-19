@@ -5,7 +5,7 @@
         - image compress；
         - image composer；
         - image crop;
-        - image blur;
+        - image filter;
     - Support Node.js / Miniprogram；
     - Support Promise;
     - Use Typescript;
