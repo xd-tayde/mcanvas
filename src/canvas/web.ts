@@ -10,11 +10,13 @@ export const _Canvas = {
         if (is.num(height)) cvs.height = height
         return [cvs, ctx] as [HTMLCanvasElement, CanvasRenderingContext2D]
     },
-    loadImage(image: string, loaded: (img: any) => any, error: (msg: string) => any) {
-        const img = new Image()
-        if (image.indexOf('http') === 0) img.crossOrigin = '*'
-        img.onload = () => loaded(img)
-        img.onerror = () => error(`img load error.url: ${image}`)
-        img.src = image
+    loadImage(image: string) {
+        return new Promise((resolve, reject) => {
+            const img = new Image()
+            if (image.indexOf('http') === 0) img.crossOrigin = '*'
+            img.onload = () => resolve(img)
+            img.onerror = () => reject(`img load error.url: ${image}`)
+            img.src = image
+        })
     },
 }

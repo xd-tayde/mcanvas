@@ -1,4 +1,4 @@
-import { MCompose } from './modules/mcompose'
-export { MCompose } from './modules/mcompose'
+import { MCanvas } from './modules/mcanvas'
+export { MCanvas } from './modules/mcanvas'
 export { MImage } from './modules/mimage'
-export default MCompose
+export default MCanvas

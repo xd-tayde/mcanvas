@@ -14,7 +14,7 @@ import {
 import { Canvas } from '@Src/canvas'
 import { crop as cropFn } from '@Src/utils/crop'
 
-export class MCompose {
+export class MCanvas {
     private ops: Required<TComposer.options>
     private cvs: HTMLCanvasElement
     private ctx: CanvasRenderingContext2D
@@ -73,7 +73,9 @@ export class MCompose {
     
         this.queue.push(() => {
             if (bg.color) this._setBgColor(bg.color)
-            Canvas.getImage(bg.image, img => this._background(img, bg), this.fn.error)
+            Canvas.getImage(bg.image)
+                .then(img => this._background(img, bg))
+                .catch(this.fn.error)
         })
         return this
     }
@@ -313,12 +315,12 @@ export class MCompose {
             // 将封装好的 add函数 推入队列中待执行；
             // 参数经过 _handleOps 加工；
             this.queue.push(() => {
-                Canvas.getImage(image, img => {
+                Canvas.getImage(image).then(img => {
                     this._add(
                         img, 
                         this._handleOps(img, extend(true, def, options))
                     )
-                }, this.fn.error)
+                }).catch(this.fn.error)
             })
         })
         return this

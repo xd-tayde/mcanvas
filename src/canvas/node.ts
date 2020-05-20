@@ -8,7 +8,7 @@ export const _Canvas = {
         const ctx = cvs.getContext('2d')
         return [cvs, ctx]
     },
-    loadImage(image: string, loaded: (img: any) => any, error: (msg: string) => any) {
-        loadImage(image).then(loaded).catch(error)
+    loadImage(image: string) {
+        return loadImage(image)
     },
 }

@@ -3,12 +3,14 @@
     "description": "the image-composer or image-croper that can draw image/text/watermark or crop the image.",
     "keywords": [
         "canvas",
-        "image-composite",
-        "image-textview",
+        "image",
+        "image-merge",
+        "image-compose",
+        "image-text",
         "image-crop",
-        "image-croper",
-        "watermark",
-        "cropper"
+        "image-filter",
+        "image-compress",
+        "watermark"
     ],
     "main": "dist/mcanvas.node.js",
     "broswer": "dist/mcanvas.web.js",

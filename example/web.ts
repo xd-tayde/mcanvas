@@ -1,4 +1,4 @@
-import { MCompose, MImage } from '../src/index'
+import { MCanvas, MImage } from '../src/index'
 import ear from './images/ear.png'
 import watermark from './images/watermark.jpg'
 import imgTest from './images/1.jpg'
@@ -144,7 +144,7 @@ let data = {
         },
     },
 }
-let mc = new MCompose({
+let mc = new MCanvas({
     width: 1000,
     height: 1500,
     // backgroundColor: 'black',

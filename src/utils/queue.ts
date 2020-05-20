@@ -39,3 +39,26 @@ export class Queue {
         }
     }
 }
+
+export class MQueue {
+    private _queue: Queue
+    constructor() {
+        this._queue = new Queue()
+    }
+    public line(fn: (data: any) => any) {
+        this._queue.push((next, data) => {
+            setTimeout(async () => {
+                const nextData = fn(data)
+                if (is.promise(nextData)) {
+                    nextData.then(next)
+                } else {
+                    next(nextData)
+                }
+            }, 0)
+        })
+        return this
+    }
+    public start(end: Next, initData?: any) {
+        this._queue.perform(end, initData)
+    }
+}

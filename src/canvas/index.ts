@@ -1,17 +1,17 @@
-import { extend, throwWarn } from '@Src/utils'
+import { extend } from '@Src/utils'
 
 const diff = ENV === 'node' ? 
     require('./node')._Canvas : 
     require('./web')._Canvas
 
 const extra = {
-    getImage(image, cbk, error) {
+    getImage(image) {
         if (typeof image === 'string') {
-            Canvas.loadImage(image, cbk, error)
-        }else if (typeof image === 'object') {
-            cbk(image)
-        }else {
-            throwWarn(`getImage error, src=${image}`)
+            return Canvas.loadImage(image)
+        } else if (typeof image === 'object') {
+            return Promise.resolve(image) 
+        } else {
+            return Promise.reject(`getImage error, src=${image}`)
         }
     },
     drawRoundRectPath(
@@ -59,5 +59,20 @@ const extra = {
     }
 }
 
-export const Canvas = extend(true, diff, extra)
+export const Canvas = extend(true, diff, extra) as {
+    create(width: number, height: number): [HTMLCanvasElement, CanvasRenderingContext2D]
+    loadImage(image: string): Promise<HTMLImageElement>
+    getImage(image: any): Promise<HTMLImageElement>
+    drawRoundRect(
+        ctx: CanvasRenderingContext2D, 
+        x: number, 
+        y: number, 
+        width: number, 
+        height: number, 
+        radius: number,
+        fillColor: string,
+        strokeWidth: number,
+        strokeColor: string,
+    ): void
+}
 

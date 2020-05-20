@@ -29,11 +29,11 @@ export class MImage {
     private _getImage() {
         // 加载图片
         return this._run(() => (
-            new Promise(resolve => {
+            new Promise(async (resolve) => {
                 if (is.str(this._image)) {
-                    Canvas.getImage(this._image, img => {
-                        resolve(this._image = img)
-                    }, this._error)
+                    Canvas.getImage(this._image)
+                        .then(img => resolve(this._image = img))
+                        .catch(this._error)
                 } else {
                     resolve(this._image)
                 }
