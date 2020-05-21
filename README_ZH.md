@@ -2,7 +2,7 @@
 
 ## 简介：
 
-在业务中，经常遇到各种合成图片的需求，如贴纸的合成，合成文字，添加水印等，因为这些业务经常需要进行各种位置，状态等参数的计算，写起来并不是那么方便。该插件就是为了解决这部分难点，封装底层 `API` 及各种计算，提供出使用更为简单的 `API`，减少项目上的重复工作，提高效率；
+在业务中，经常遇到各种处理图片的需求，图片合成，添加文字，添加水印，压缩，裁剪，常用滤镜处理，因为这些业务经常需要进行各种位置，状态等参数的计算，写起来并不是那么方便。该插件就是为了解决这部分难点，封装底层 `API` 及各种计算，提供出使用更为简单的 `API`，减少项目上的重复工作，提高效率；
 
 ## 简单示例(详细功能请查询API)：
 
@@ -28,12 +28,12 @@ mc.background('imageUrl',{
 
 // add 添加图片素材基础函数；
 .add('images/nose.png',{
-    width:183,
+    width: 183,
     pos:{
-        x:250,
-        y:369,
-        scale:0.84,
-        rotate:1,
+        x: 250,
+        y: 369,
+        scale: 0.84,
+        rotate: 1,
     },
 })
 
@@ -44,7 +44,7 @@ mc.background('imageUrl',{
     pos:{
         x:0,
         y:0,
-	  },
+	},
 })
 
 // watermark 添加水印函数，基于 add 函数封装；
@@ -55,7 +55,7 @@ mc.background('imageUrl',{
 
 // draw 最终绘制函数，用于最终的绘制；
 .draw( b64 =>{
-	 console.log(b64);
+	console.log(b64);
 });
 
 ```
@@ -64,29 +64,49 @@ mc.background('imageUrl',{
 
 ### 创建实例：
 
-#### `new MCanvas(options)` || `MCanvas(options)`:
+#### `new MCanvas(options)`:
 
 创建画布，初始化 `Canvas` ;
 
 params:
 
-- {Object} options
-	- {Number} width : 画布宽度，可选；
-	- {Number} height : 画布高度，可选；
-	- {Color} backgroundColor : 画布背景颜色，可选；
+```js
+interface options {
+    // 画布宽度；
+    width?: number,
+    // 画布高度；
+    height?: number,
+    // 画布背景颜色；
+    backgroundColor?: string,
+}
+```
 
 用法:
 ```js
-	MCanvas({
-		width : 500,
-		height: 500,
-		backgroundColor: '#fff',
-	})
+MCanvas({
+    width : 500,
+    height: 500,
+    backgroundColor: '#fff',
+})
+```
+
+### 参数说明
+
+为了方便绘制，提供了各种形式的参数值，只要是涉及长度或者位置，皆可以使用多种形式， 下面说明均使用 TS 语法： number | string 表示；
+
+例如:
+
+```js
+// 长度单位包含三种形式: 数值 与 百分比
+width: 100 | '100px' | '100%',
+
+// 位置单位包含四种形式: 数值 / 百分比 / 绝对定位 / 关键字
+x: 100 | '100px' | '100%' | 'left/right/center: 100' | 'center' 
 ```
 
 ### 方法：
 
-#### 1、 `mc.background(image,options)`:
+#### 1、 `mc.background(image, options)`:
 
 绘制画布的底图；
 
@@ -98,30 +118,27 @@ options: 初次必填，之后可选；
 
 ```js
 // image : 背景图片，type: url/HTMLImageElement/HTMLCanvasElement
-
-mc.background(image, {
-
+mc.background(
+    image: string | HTMLImageElement | HTMLCanvasElement, 
+    {
     // 绘制方式: origin / crop / contain
-    	// origin : 原图模式，画布与背景图大小一致，忽略初始化传入的画布宽高；忽略 left/top值；
-    	// crop : 裁剪模式，背景图自适应铺满画布，多余部分裁剪；可通过 left/top值控制裁剪部分；
-    	// contain : 包含模式, 类似于 background-size:contain; 可通过left/top值进行位置的控制；
-    type:'origin',
-
+    	// origin : 原图模式，画布与背景图大小一致，忽略初始化传入的画布宽高；忽略 left / top值；
+    	// crop : 裁剪模式，背景图自适应铺满画布，多余部分裁剪；可通过 left / top 值控制裁剪部分；
+    	// contain : 包含模式, 类似于 background-size:contain; 可通过 left / top 值进行位置的控制；
+    type: 'origin' | 'crop' | 'contain' ,
 
     // 背景图片距离画布左上角的距离，
     // 100 / '100%' / '100px'
-    // 0% ： 居左裁剪； 50% ：代表居中裁剪； 100% ： 代表居右裁剪
-    left:'50%',
-    top:0,
-
+    // 0%： 居左裁剪； 50% ：代表居中裁剪； 100%： 代表居右裁剪
+    left: number | string,
+    top: number | string,
 
     // 除了背景图外的颜色，仅在 type:contain时可见；
-    color:'#000000',
-
+    color: string,
 })
 ```
 
-#### 2、`add(image,options)`/`add([{image:'',options:{}},{image:'',options:{}}])`:
+#### 2、`add(image, options)`:
 
 通用的添加图层函数，可使用上面两种调用方式，添加多张或者单张素材；
 
@@ -129,26 +146,26 @@ params:
 
 ```js
 // 素材图，type: url/HTMLImageElement/HTMLCanvasElement
-image : '',
+image: string | HTMLImageElement | HTMLCanvasElement,
 
 // 配置参数：
 options : {
 	// 素材的宽度值，相对于画布；
 	// example: width: 100 / '100%' / '100px';
-    width:'100%',
+    width: number | string,
 
     // 裁剪系数，相对于素材图；
     // crop params;
     crop:{
     	 // 相对于素材图的坐标点，原点为左上点；
-        x:0,
-        y:0,
+        x: number | string,
+        y: number | string,
 
         // 需要裁剪的宽高, example:100/'100%'/'100px'；
         // 内部有做最大值的判断；
 
-        width:'100%',
-        height:'100%',
+        width: number | string,
+        height: number | string,
     },
 
     // 位置系数，相对于画布；
@@ -156,14 +173,14 @@ options : {
     	 // 相对于画布的坐标点，原点为左上点;
     	 // example：
     	 // x: 250 / '250px' / '100%' / 'left:250' / 'center',
-        x:0,
-        y:0,
+        x: number | string,
+        y: number | string,
 
         // 素材放大值，会叠加 width 值，进行进一步基于中心点放大；
-        scale:1,
+        scale: number | string,
 
         // 素材旋转角度；
-        rotate:0,
+        rotate: number | string,
     },
 }
 

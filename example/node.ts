@@ -1,4 +1,4 @@
-import { MImage, MCompose } from '@Src/index'
+import { MImage, MCanvas } from '@Src/index'
 const path = require('path');
 
 (async () => {
@@ -15,7 +15,7 @@ const path = require('path');
 
     const ear = path.resolve(__dirname, './images/ear.png')
     const water = path.resolve(__dirname, './images/watermark.jpg')
-    const mc = new MCompose()
+    const mc = new MCanvas()
     mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
         type: 'origin',
     })
@@ -52,7 +52,7 @@ const path = require('path');
     mc.circle({
         x: 'center',
         y: 'center',
-        r: 100,
+        radius: 100,
         strokeWidth : 5,
         strokeColor: '#996699',
         fillColor: 'rgba(0,0,0,.5)',

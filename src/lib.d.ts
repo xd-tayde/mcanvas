@@ -1,12 +1,12 @@
 declare module 'mcanvas' {
-    export class MCompose {
-        constructor(options?: TComposer.options)
-        background(image?: TCommon.image, bg?: TComposer.backgroundOptions): MCompose
-        rect(ops?: TComposer.rectOptions): MCompose
-        circle(ops?: TComposer.circleOptions): MCompose
-        watermark(image: TCommon.image, ops?: TComposer.watermarkOptions): MCompose
-        add(image: TComposer.addData[] | TCommon.image, options?: TComposer.addOptions): MCompose
-        text(context: string, ops?: TComposer.textOptions): MCompose
+    export class MCanvas {
+        constructor(options?: TCanvas.options)
+        background(image?: TCommon.image, bg?: TCanvas.backgroundOptions): MCanvas
+        rect(ops?: TCanvas.rectOptions): MCanvas
+        circle(ops?: TCanvas.circleOptions): MCanvas
+        watermark(image: TCommon.image, ops?: TCanvas.watermarkOptions): MCanvas
+        add(image: TCanvas.addData[] | TCommon.image, options?: TCanvas.addOptions): MCanvas
+        text(context: string, ops?: TCanvas.textOptions): MCanvas
         draw(ops?: TCommon.drawOptions | ((b64: string) => void)): Promise<string | HTMLCanvasElement>
     }
     

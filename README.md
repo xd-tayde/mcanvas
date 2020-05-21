@@ -1,4 +1,4 @@
-# Mcanvas.js
+# mcanvas
 
  **[Example](http://f2er.meitu.com/gxd/mcanvas/example/index.html)**
 
@@ -10,7 +10,7 @@
 
 ## Introduction
 
-Mcanvas is a plugin that can easily compose the image, text, watermark and export a image of base64 finally. It provides some simple api that based on canvas, in order to make your work more efficiently and conveniently.
+mcanvas is a image handler plugin that can easily merge, crop, compress, filter the image and export a image of base64 finally. It provides some simple api that based on canvas, in order to make your work more efficiently and conveniently.
 
 ## Installation
 
@@ -29,20 +29,20 @@ import MCanvas from 'mcanvas'
 
 ```js
 // create the canvas by width and height;
-import MC from 'mcanvas'
+import { MCanvas } from 'mcanvas'
 
-const mc = new MC({
+const mc = new MCanvas({
 	width,
 	height,
 	backgroundColor,
 });
 
 // prepare background-image
-mc.background(image,{
-    left:0,
-    top:0,
-    color:'#000000',
-    type:'origin',
+mc.background(image, {
+    left: 0,
+    top: 0,
+    color: '#000000',
+    type: 'origin',
 })
 
 // prepare the image material, add into queue;
@@ -73,27 +73,26 @@ mc.background(image,{
 })
 
 // draw all material that prepared before, and get the base64-image
-.draw( b64 =>{
+.draw(b64 =>{
     console.log(b64);
 });
 ```
 
 ```js
-// MCrop,  a image cropper
-import { MCrop } from 'mcanvas'
+// image handler
+    // inclue crop / compress / common filter
+import { MImage } from 'mcanvas'
 
-MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
-    // cropper shape
-    type: 'circle',
-    // crop by pos
+const mi = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
+
+mi.crop({
     x: 'center',
-    y: '0',
-    // radius
-    r: 200,
-    // the success callback
-    success(b64) {
-        // the base64 of cropped image
-    },
+    y: 'center',
+    width: 100,
+    height: 100,
+    radius: 10,
+}).filter('blur').compress((b64 =>{
+    console.log(b64);
 })
 ```
 

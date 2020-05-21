@@ -15,11 +15,11 @@ import { Canvas } from '@Src/canvas'
 import { crop as cropFn } from '@Src/utils/crop'
 
 export class MCanvas {
-    private ops: Required<TComposer.options>
+    private ops: Required<TCanvas.options>
     private cvs: HTMLCanvasElement
     private ctx: CanvasRenderingContext2D
     // 绘制函数队列；
-    private queue: TComposer.queue = []
+    private queue: TCanvas.queue = []
     // 回调函数池；
     private fn = {
         // 最后执行的函数；
@@ -27,7 +27,7 @@ export class MCanvas {
         // 错误回调；
         error(err) {},
     }
-    private data: TComposer.data = {
+    private data: TCanvas.data = {
         // 文字id；
         textId: 0,
         // 文字绘制数据；
@@ -35,7 +35,7 @@ export class MCanvas {
         // 背景图数据;
         bgConfig: null,
     }
-    constructor(options: TComposer.options = { }) {
+    constructor(options: TCanvas.options = { }) {
         // 配置canvas初始大小；
         // width：画布宽度，Number,选填，默认为 500;
         // height: 画布高度，Number，选填，默认与宽度一致；
@@ -57,7 +57,7 @@ export class MCanvas {
     // --------------------------------------------------------
     // 绘制背景部分；
     // --------------------------------------------------------
-    public background(image?: TCommon.image, bg: TComposer.backgroundOptions = { type : 'origin' }) {
+    public background(image?: TCommon.image, bg: TCanvas.backgroundOptions = { type : 'origin' }) {
         if (!image && !this.data.bgConfig) {
             throwError('the init background must has a image.')
             return this
@@ -87,7 +87,7 @@ export class MCanvas {
     }
 
     private _getBgAlign(
-        left: TComposer.backgroundOptions['left'], 
+        left: TCanvas.backgroundOptions['left'], 
         iw: number, 
         cw: number, 
         cropScale: number
@@ -109,7 +109,7 @@ export class MCanvas {
         return rv
     }
     
-    private _background(img: HTMLImageElement, bg: TComposer.backgroundOptions) {
+    private _background(img: HTMLImageElement, bg: TCanvas.backgroundOptions) {
         const { iw, ih } = getSize(img)
         // 图片与canvas的长宽比；
         const iRatio = iw / ih
@@ -179,7 +179,7 @@ export class MCanvas {
     // --------------------------------------------------------
 
     // 绘制矩形层；
-    public rect(ops: TComposer.rectOptions = {}) {
+    public rect(ops: TCanvas.rectOptions = {}) {
         this.queue.push(() => {
             const { width: cw, height: ch } = this.cvs
             const { 
@@ -198,12 +198,8 @@ export class MCanvas {
 
             Canvas.drawRoundRect(
                 this.ctx, 
-                x, y, 
-                width, height, 
-                radius, 
-                fillColor,
-                strokeWidth,
-                strokeColor,
+                x, y, width, height, radius, 
+                fillColor, strokeWidth, strokeColor,
             )
 
             this._resetCtx()._next()
@@ -212,7 +208,7 @@ export class MCanvas {
     }
 
     // 绘制圆形层；
-    public circle(ops: TComposer.circleOptions = {}) {
+    public circle(ops: TCanvas.circleOptions = {}) {
         this.queue.push(() => {
             const { fillColor = '#fff', strokeColor = fillColor, strokeWidth = 0 } = ops
             const { width: cw, height: ch } = this.cvs
@@ -244,7 +240,7 @@ export class MCanvas {
     // 绘制水印；基于 add 函数封装；
     public watermark(
         image: TCommon.image, 
-        ops: TComposer.watermarkOptions = {},
+        ops: TCanvas.watermarkOptions = {},
     ) {
         if (!image) {
             throwError('there is not image of watermark.')
@@ -253,7 +249,7 @@ export class MCanvas {
 
         // 参数默认值；
         const { width = '40%', pos = 'rightbottom', margin = 20 } = ops
-        const position: Required<TComposer.position> = {
+        const position: Required<TCanvas.position> = {
             x: 0,
             y: 0,
             scale: 1,
@@ -289,8 +285,8 @@ export class MCanvas {
     // 多张图: add([{image:'',options:{}},{image:'',options:{}}]);
     // 单张图: add(image,options);
     public add(
-        image: TComposer.addData[] | TCommon.image, 
-        options?: TComposer.addOptions
+        image: TCanvas.addData[] | TCommon.image, 
+        options?: TCanvas.addOptions
     ) {
         // 默认参数；
         const def = {
@@ -326,7 +322,7 @@ export class MCanvas {
         return this
     }
 
-    private _add(img, ops: Required<TComposer.addOptions>) {
+    private _add(img, ops: Required<TCanvas.addOptions>) {
         const crop = ops.crop as {
             x: number,
             y: number,
@@ -427,7 +423,7 @@ export class MCanvas {
     }
 
     // 参数加工函数；
-    private _handleOps(img: TGetSizeImage, ops: Required<TComposer.addOptions>) {
+    private _handleOps(img: TGetSizeImage, ops: Required<TCanvas.addOptions>) {
         const { width: cw, height: ch } = this.cvs
         const { iw, ih } = getSize(img)
 
@@ -488,7 +484,7 @@ export class MCanvas {
             },
         }
     }
-    public text(context: string, ops: TComposer.textOptions = {}) {
+    public text(context: string, ops: TCanvas.textOptions = {}) {
         // 默认的字体大小;
         const dfs = this.cvs.width / 20
 
@@ -504,7 +500,7 @@ export class MCanvas {
                     y: 0,
                     rotate: 0,
                 },
-            }, ops) as Required<TComposer.textOptions>
+            }, ops) as Required<TCanvas.textOptions>
 
             // 解析字符串模板后，调用字体绘制函数；
             const parseContext = this._parse(String(context))
@@ -568,7 +564,7 @@ export class MCanvas {
             text: string;
             size: 0 | 1 | 2;
         }[], 
-        option: Required<TComposer.textOptions>
+        option: Required<TCanvas.textOptions>
     ) {
         this.data.textId++
         this.data.text[this.data.textId] = {}

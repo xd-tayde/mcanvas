@@ -72,23 +72,24 @@ export class MImage {
                 if (config.type === 'jpg') config.type = 'jpeg'
             }
 
-            const success = (result) => {
-                config.success(result)
+            const { exportType, type, quality, success, error } = config
+            const _success = (result) => {
+                success(result)
                 resolve(result)
             } 
 
             this._error = (err) => {
-                config.error(err)
+                error(err)
                 reject(err)
             }
 
             this._queue.perform(({ cvs }) => {
-                if (config.exportType === 'canvas') {
-                    success(cvs)
+                if (exportType === 'canvas') {
+                    _success(cvs)
                 } else {
                     setTimeout(() => {
-                        const b64 = cvs.toDataURL(`image/${config.type}`, config.quality)
-                        success(b64)
+                        const b64 = cvs.toDataURL(`image/${type}`, quality)
+                        _success(b64)
                     }, 0)
                 }
             })

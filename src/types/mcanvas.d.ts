@@ -1,4 +1,4 @@
-declare namespace TComposer {
+declare namespace TCanvas {
     interface options {
         width?: number,
         height?: number,
