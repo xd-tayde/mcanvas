@@ -4,46 +4,11 @@ import watermark from './images/watermark.jpg'
 import imgTest from './images/1.jpg'
 import './main.scss'
 
-(async () => {
-    // const mc = new MImage(imgTest)
-    // const b64 = await mc.crop({
-    //     x: 100,
-    //     y: 100,
-    //     width: 300,
-    //     height: 300,
-    //     radius: 0,
-    // }).filter('blur').draw()
-    // $('#img111').attr('src', b64)
-
-    // const b64 = await mcrop.draw()
-    // console.log(b64)
-    // $('#img111').attr('src', b64)
-    // mcrop.draw({
-    //     success(b64) {
-    //         console.log(b64)
-    //         $('#img111').attr('src', b64)
-    //     }
-    // })
-})()
-// MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
-//     type: 'rect',
-//     x: 0,
-//     y: 0,
-//     width: 690,
-//     height: 300,
-//     success(b64) {
-//         $('#img111').attr('src', b64)
-//     },
-// })
-// MCrop('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
-//     type: 'circle',
-//     x: 'center',
-//     y: '0',
-//     r: 200,
-//     success(b64) {
-//         $('#img111').attr('src', b64)
-//     },
-// })
+// (async () => {
+//     const mc = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
+//     const b64 = await mc.filter('blur', 6).draw()
+//     $('.js-result').attr('src', b64)
+// })()
 
 let $sure = $('.js-sure')
 let $params = $('.js-params')
@@ -143,6 +108,13 @@ let data = {
             },
         },
     },
+    crop: {
+        x: 'center',
+        y: 'center',
+        width: 300,
+        height: 300,
+        radius: 150,
+    }
 }
 let mc = new MCanvas({
     width: 1000,
@@ -155,6 +127,8 @@ mc.background('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg', {
     left: '50%',
     top: '50%',
 })
+
+const mi = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
 
 let timer
 $('.Button').on('touchstart', function(this: any) {
@@ -180,18 +154,15 @@ $clear.on('click', () => {
 })
 
 $('.js-addImage').on('click', () => {
-    let type = `image`
-    showDialog(type, data.addImageOps)
+    showDialog(`image`, data.addImageOps)
 })
 
 $('.js-addWm').on('click', () => {
-    let type = `watermark`
-    showDialog(type, data.addWmOps)
+    showDialog(`watermark`, data.addWmOps)
 })
 
 $('.js-addText').on('click', () => {
-    let type = `text`
-    showDialog(type, data.addTextOps)
+    showDialog(`text`, data.addTextOps)
 })
 
 $('.js-addRect').on('click', () => {
@@ -205,6 +176,7 @@ $('.js-addCircle').on('click', () => {
 $sure.on('click', function(this: any) {
     let ops = $(this).data('ops')
     let type = $(this).data('type')
+
     mcDraw(ops, type)
 })
 
@@ -248,6 +220,15 @@ function mcDraw(ops, type) {
                 $dialog.hide()
             })
             break
+        case `crop`:
+            mi.crop(ops).draw({
+                type: 'png',
+                success(b64) {
+                    $('.js-cropResult').css('background-image', `url(${b64})`)
+                    $dialog.hide()
+                }
+            })
+            break
         default:
     }
 
@@ -258,22 +239,20 @@ function showDialog(type, ops) {
     let html
     switch (type) {
         case 'image':
-            html = `<li>image:'${ops.image}'</li>
-                    <li>options:{</li>
-                    <li>${tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
-                    <li>${tab}pos:{</li>
-                    <li>${tab + tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
-                    <li>${tab + tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
-                    <li>${tab + tab}scale:<input data-type='scale' class='js-input input' type='text' value='${ops.options.pos.scale}'></li>
-                    <li>${tab + tab}rotate:<input data-type='rotate' class='js-input input' type='text' value='${ops.options.pos.rotate}'></li>
-                    <li>${tab}}</li>
+            html = `<li>options: {</li>
+                    <li>${tab + tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
+                    <li>${tab + tab}pos: {</li>
+                    <li>${tab + tab + tab + tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
+                    <li>${tab + tab + tab + tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
+                    <li>${tab + tab + tab + tab}scale:<input data-type='scale' class='js-input input' type='text' value='${ops.options.pos.scale}'></li>
+                    <li>${tab + tab + tab + tab}rotate:<input data-type='rotate' class='js-input input' type='text' value='${ops.options.pos.rotate}'></li>
+                    <li>${tab + tab}}</li>
                     <li>}</li>`
             break
         case 'watermark':
-            html = `<li>image:'${ops.image}'</li>
-                    <li>options:{</li>
-                    <li>${tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
-                    <li>${tab}pos:
+            html = `<li>options: {</li>
+                    <li>${tab + tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
+                    <li>${tab + tab}pos:
                         <select data-type='pos' class='js-select select'>
                             <option>rightBottom</option>
                             <option>rightTop</option>
@@ -283,21 +262,30 @@ function showDialog(type, ops) {
                     <li>}</li>`
             break
         case 'text':
-            html = `<li>text:<span style="font-size:12px;">''&lt;b&gt;Large/Stroke&lt;/b&gt;Normal/Gradient&lt;s&gt;Small/Shadow&lt;/s&gt;''</span></li>
+            html = `<li>text: <span style="font-size:12px;">''&lt;b&gt;Large/Stroke&lt;/b&gt;Normal/Gradient&lt;s&gt;Small/Shadow&lt;/s&gt;''</span></li>
                     <li>options:{</li>
-                    <li>${tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
-                    <li>${tab}align:
+                    <li>${tab + tab}width:<input data-type='width' class='js-input input' type='text' value='${ops.options.width}'></li>
+                    <li>${tab + tab}align:
                         <select data-type='align' class='js-select select'>
                             <option>left</option>
                             <option>center</option>
                             <option>right</option>
                         </select>
                     </li>
-                    <li>${tab}pos:{
-                    <li>${tab + tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
-                    <li>${tab + tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
-                    <li>${tab}}</li>
+                    <li>${tab + tab}pos:{
+                    <li>${tab + tab + tab + tab}x:<input data-type='x' class='js-input input' type='text' value='${ops.options.pos.x}'></li>
+                    <li>${tab + tab + tab + tab}y:<input data-type='y' class='js-input input' type='text' value='${ops.options.pos.y}'></li>
+                    <li>${tab + tab}}</li>
                     <li>}</li>`
+            break
+        case 'crop': 
+            html = `<li>options: {</li>
+                <li>${tab + tab}width: <input data-class="crop" data-type='width' class='js-input input' type='text' value='${ops.width}'></li>
+                <li>${tab + tab}height: <input data-class="crop" data-type='height' class='js-input input' type='text' value='${ops.height}'></li>
+                <li>${tab + tab}x:<input data-class="crop" data-type='x' class='js-input input' type='text' value='${ops.x}'></li>
+                <li>${tab + tab}y:<input data-class="crop" data-type='y' class='js-input input' type='text' value='${ops.y}'></li>
+                <li>${tab + tab}radius:<input data-class="crop" data-type='radius' class='js-input input' type='text' value='${ops.radius}'></li>
+                <li>}</li>`
             break
         default:
     }
@@ -311,27 +299,52 @@ $(window).on('input', '.js-input', function(this: any) {
     let v = $this.val()
     let type = $this.data('type')
     let ops = $sure.data('ops')
-    switch (type) {
-        case 'width':
-            ops.options.width = v
-            break
-        case 'x':
-            ops.options.pos.x = v
-            break
-        case 'y':
-            ops.options.pos.y = v
-            break
-        case 'scale':
-            ops.options.pos.scale = v
-            break
-        case 'rotate':
-            ops.options.pos.rotate = v
-            break
-        case 'align':
-            ops.options.align = v
-            break
-        default:
+    const cls = $this.data('class')
+
+    if (cls === 'crop') {
+        switch (type) {
+            case 'width':
+                ops.width = v
+                break
+            case 'height':
+                ops.height = v
+                break
+            case 'x':
+                ops.x = v
+                break
+            case 'y':
+                ops.y = v
+                break
+            case 'radius':
+                ops.radius = v
+                break
+            default:
+                break
+        }
+    } else {
+        switch (type) {
+            case 'width':
+                ops.options.width = v
+                break
+            case 'x':
+                ops.options.pos.x = v
+                break
+            case 'y':
+                ops.options.pos.y = v
+                break
+            case 'scale':
+                ops.options.pos.scale = v
+                break
+            case 'rotate':
+                ops.options.pos.rotate = v
+                break
+            case 'align':
+                ops.options.align = v
+                break
+            default:
+        }
     }
+    
     $sure.data('ops', JSON.stringify(ops))
 })
 
@@ -347,5 +360,18 @@ $(window).on('change', '.js-select', function(this: any) {
     let type = $(this).data('type')
     ops.options[type] = $(this).val()
     $sure.data('ops', JSON.stringify(ops))
+})
+
+$('.js-cropImage').on('click', () => {
+    showDialog(`crop`, data.crop)
+})
+
+$('.js-filter').on('click', function(this: any) {
+    const $btn = $(this)
+    const $par = $btn.parent()
+    const type = $btn.data('type')
+    mi.filter(type).draw(b64 => {
+        $par.css('background-image', `url(${b64})`)
+    })
 })
 

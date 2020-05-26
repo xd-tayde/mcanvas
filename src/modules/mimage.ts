@@ -76,6 +76,7 @@ export class MImage {
             const _success = (result) => {
                 success(result)
                 resolve(result)
+                this.clear()
             } 
 
             this._error = (err) => {
@@ -93,6 +94,7 @@ export class MImage {
                     }, 0)
                 }
             })
+
         })
     }
     // 裁剪

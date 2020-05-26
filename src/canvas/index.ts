@@ -69,10 +69,10 @@ export const Canvas = extend(true, diff, extra) as {
         y: number, 
         width: number, 
         height: number, 
-        radius: number,
-        fillColor: string,
-        strokeWidth: number,
-        strokeColor: string,
+        radius?: number,
+        fillColor?: string,
+        strokeWidth?: number,
+        strokeColor?: string,
     ): void
 }
 

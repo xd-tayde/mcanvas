@@ -34,31 +34,60 @@
     </script>
 </head>
 <body>
-    <h1 class="title">MCanvas.js</h1>
-    <h2 class="sub-title">There just be a composite image! You can longTap to save it!</h2>
-    <div class="top">
-        <img class="origin js-result" src="http://mtapplet.meitudata.com/596c72073971d86b5128.jpg" alt="">
+    <h1 class="title">MCanvas</h1>
+    <h2 class="sub-title">mcanvas is a image handler plugin that can easily merge, crop, compress, <br/>filter the image and export a image of base64 finally!</h2>
+    <div class="left">
+        <div class="left__title">MERGE IMAGE: </div>
+        <div class="left__img">
+            <img class="origin js-result" src="http://mtapplet.meitudata.com/596c72073971d86b5128.jpg" alt="">
+        </div>
+        <div class="left__btns">
+            <span class="Button js-addImage">Add Image</span>
+            <span class="Button js-addWm">Watermark</span>
+            <span class="Button js-addText">Add Text</span>
+            <span class="Button js-addRect">Add Rect</span>
+            <span class="Button js-addCircle">Add Circle</span>
+            <span class="Button clear js-clear">Reset</span>
+        </div>
     </div>
-    <div class="addBtn">
-        <span class="Button js-addImage">Add image</span>
-        <span class="Button js-addWm">Watermark</span>
-        <span class="Button js-addText">Add text</span>
-        <span class="Button js-addRect">Add rect</span>
-        <span class="Button js-addCircle">Add circle</span>
-        <span class="Button clear js-clear">Reset</span>
+    <div class="right">
+        <div class="right__crop">
+            <div class="right__crop__title">CROP IMAGE: </div>
+            <div class="right__crop__img js-cropResult"></div>
+            <span class="Button js-cropImage">Crop Image</span>
+        </div>
+        <div class="right__filter">
+            <div class="right__filter__title">FILTER IMAGE: </div>
+            <div class="right__filter__list">
+                <div class="right__filter__img">
+                    <div class="right__filter__btn js-filter" data-type="blur">Blur</div>
+                </div>
+                <div class="right__filter__img">
+                    <div class="right__filter__btn js-filter" data-type="flip">Flip</div>
+                </div>
+                <div class="right__filter__img">
+                    <div class="right__filter__btn js-filter" data-type="gray">Gray</div>
+                </div>
+                <div class="right__filter__img">
+                    <div class="right__filter__btn js-filter" data-type="mosaic">Mosaic</div>
+                </div>
+                <!-- <div class="right__filter__img">
+                    <div class="right__filter__btn js-filter" data-type="oil">Oil</div>
+                </div> -->
+            </div>
+        </div>
     </div>
     <!-- <div class="bottom">
         <img class="result js-result" src="" alt="" >
     </div> -->
     <div class="dialog js-dialog">
         <div class="window">
-            <h3>params:</h3>
+            <h3>Params:</h3>
             <ul class="params js-params"></ul>
             <span class="Button js-cancel">Cancel</span>
             <span class="Button js-sure">OK</span>
         </div>
     </div>
-    <img id="img111" alt="">
     <script src="./zepto.min.js"></script>
     <!-- <script src="http://h5.meitu.com/js/console.min.js"></script> -->
 </body>

@@ -59,6 +59,7 @@ function boxBlur(src, dst, width, height, radius) {
             
             dstIndex += height
         }
+
         srcIndex += width
     }
 }
@@ -69,20 +70,15 @@ function boxBlur(src, dst, width, height, radius) {
  * Copyright 2005 Huxtable.com. All rights reserved.
  */
 export function blur(cvs: HTMLCanvasElement, value: number = 6) {
-    const { width, height } = cvs
     const ctx = cvs.getContext('2d') as CanvasRenderingContext2D
-    const { data: oPixels } = ctx.getImageData(0, 0, width, height)
-    const imageData = ctx.createImageData(width, height)
-    const dstPixels = imageData.data
-    const tmpData = ctx.createImageData(width, height)
-    const tmpPixels = tmpData.data
-
-    for (let i = 0; i < value; i += 1) {
-        boxBlur(i ? dstPixels : oPixels, tmpPixels, width, height, 2)
-        boxBlur(tmpPixels, dstPixels, width, height, 2)
+    ctx.globalAlpha = 1 / (2 * +value)
+    for (let y = -value; y <= value; y += 2) {
+        for (let x = -value; x <= value; x += 2) {
+            ctx.drawImage(cvs, x, y)
+            if (x >= 0 && y >= 0) ctx.drawImage(cvs, -(x - 1), -(y - 1))
+        }
     }
-
-    ctx.putImageData(imageData, 0, 0)
+    ctx.globalAlpha = 1
     return [cvs, ctx]
 }
 // 翻转
