@@ -84,12 +84,13 @@ export class MImage {
                 reject(err)
             }
 
-            this._queue.perform(({ cvs }) => {
+            this._queue.perform(({ cvs, quality: _quailty }) => {
+                document.body.appendChild(cvs)
                 if (exportType === 'canvas') {
                     _success(cvs)
                 } else {
                     setTimeout(() => {
-                        const b64 = cvs.toDataURL(`image/${type}`, quality)
+                        const b64 = cvs.toDataURL(`image/${type}`, _quailty || quality)
                         _success(b64)
                     }, 0)
                 }
@@ -101,9 +102,21 @@ export class MImage {
     public crop(options: TImage.cropOptions = {}) {
         return this._run(({ cvs }) => crop(cvs, options))
     }
-    // 压缩
-    public compress(options: TCommon.drawOptions = {}) {
-        return this.draw(options)
+    // 压缩质量，修改尺寸
+    public compress(options: TImage.compressOptions = {}) {
+        return this._run(({ cvs, ctx }) => {
+            let { quality, width, height } = options
+            const ratio = cvs.width / cvs.height
+
+            if (!is.num(width) && !is.num(height)) return { cvs, ctx, quality }
+            if (!is.num(width)) width = height! * ratio
+            if (!is.num(height)) height = width / ratio
+
+            const [nCvs, nCtx] = Canvas.create(width, height)
+            nCtx.drawImage(cvs, 0, 0, width, height)
+
+            return { cvs: nCvs, ctx: nCtx, quality }
+        })
     }
     // 滤镜
     public filter(type: TImage.ftype, ...data) {

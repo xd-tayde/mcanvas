@@ -1,5 +1,16 @@
 # mcanvas
 
+New version 2.0.0 is coming. It contains some new features:
+
+- Support new function:
+    - image merge；
+    - image compress；
+    - image crop;
+    - image filter;
+- Support usage in node.js；
+- .draw() support usage by promise;
+- rewrite in typescript;
+
  **[Example](http://f2er.meitu.com/gxd/mcanvas/example/index.html)**
 
  **[Git](https://github.com/xd-tayde/mcanvas)**
@@ -22,10 +33,12 @@ mcanvas is a image handler plugin that can easily merge, crop, compress, filter 
 ```js
 npm install mcanvas --save
 
-import MCanvas from 'mcanvas'
+import { MCanvas } from 'mcanvas'
 ```
 
 ## Basic Usage
+
+- `MCanvas`
 
 ```js
 // create the canvas by width and height;
@@ -77,6 +90,7 @@ mc.background(image, {
     console.log(b64);
 });
 ```
+- `MImage`
 
 ```js
 // image handler
@@ -85,15 +99,29 @@ import { MImage } from 'mcanvas'
 
 const mi = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
 
-mi.crop({
-    x: 'center',
-    y: 'center',
-    width: 100,
-    height: 100,
-    radius: 10,
-}).filter('blur').compress((b64 =>{
-    console.log(b64);
-})
+mi
+    // crop to area by 300 * 300 and center in origin image
+	.crop({
+	    x: 'center',
+	    y: 'center',
+	    width: 300,
+	    height: 300,
+	    radius: 10,
+    })
+
+    // blur after crop
+    .filter('blur')
+
+    // compress into a image that width is 200px and quality is 0.9
+	.compress({
+        width: 200,
+        quality: .9,
+    })
+    
+    // get the base64-image
+    .draw(b64 => {
+        console.log(b64)
+    })
 ```
 
 ## License

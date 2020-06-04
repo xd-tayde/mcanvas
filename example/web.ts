@@ -4,11 +4,15 @@ import watermark from './images/watermark.jpg'
 import imgTest from './images/1.jpg'
 import './main.scss'
 
-// (async () => {
-//     const mc = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
-//     const b64 = await mc.filter('blur', 6).draw()
-//     $('.js-result').attr('src', b64)
-// })()
+(async () => {
+    const mc = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
+    const b64 = await mc.compress({
+        width: 1000,
+        // height: 100,
+        quality: 1,
+    }).draw()
+    $('.js-result').attr('src', b64)
+})()
 
 let $sure = $('.js-sure')
 let $params = $('.js-params')

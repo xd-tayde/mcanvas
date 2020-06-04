@@ -13,7 +13,7 @@ declare module 'mcanvas' {
     export class MImage {
         constructor(image: TCommon.image)
         crop(options?: TImage.cropOptions): MImage
-        compress(options?: TCommon.drawOptions): MImage
+        compress(options?: TImage.compressOptions): MImage
         filter(type: TImage.ftype, ...data: any): MImage
         clear(): MImage
         draw(ops?: TCommon.drawOptions | ((b64: string) => void)): Promise<string | HTMLCanvasElement>

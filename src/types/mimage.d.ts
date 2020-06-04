@@ -7,5 +7,9 @@ declare namespace TImage {
         height?: number | string
         radius?: number | string
     } 
-    
+    interface compressOptions {
+        quality?: number,
+        width?: number,
+        height?: number,
+    }
 }
