@@ -1,0 +1,317 @@
+/* reset */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, legend, input, button, textarea, p, blockquote, th, td, header, section, aside, nav, menu, hgroup, audio, video, figure, figcaption, footer, article {
+  margin: 0;
+  padding: 0; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+em {
+  font-style: normal; }
+
+fieldset, img {
+  border: 0;
+  vertical-align: middle; }
+
+li {
+  list-style: none; }
+
+caption, th {
+  text-align: left; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%; }
+
+body, input, button, textarea, select {
+  *font-size: 100%;
+  outline: none;
+  -webkit-appearance: none; }
+
+textarea {
+  resize: none;
+  outline: none; }
+
+i, cite {
+  font-style: normal; }
+
+a {
+  text-decoration: none; }
+
+a:focus {
+  outline: none; }
+
+html {
+  font-size: 20px; }
+
+html, body {
+  -webkit-touch-callout: none;
+  height: 100%; }
+
+.clearfix {
+  zoom: 1; }
+
+.clearfix:after {
+  content: "";
+  display: block;
+  clear: both;
+  height: 0;
+  visibility: hidden; }
+
+.hide {
+  display: none; }
+
+.fr {
+  float: right; }
+
+.fl {
+  float: left; }
+
+.block {
+  display: block; }
+
+.bold {
+  font-weight: bold; }
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%); }
+
+.auto {
+  margin-left: auto;
+  margin-right: auto; }
+
+@media only screen and (max-width: 360px) and (min-width: 321px) {
+  html {
+    font-size: 22.5px; } }
+
+@media only screen and (max-width: 375px) and (min-width: 361px) {
+  html {
+    font-size: 23.4px; } }
+
+@media only screen and (max-width: 390px) and (min-width: 376px) {
+  html {
+    font-size: 24px; } }
+
+@media only screen and (max-width: 416px) and (min-width: 391px) {
+  /*iphone6 plus*/
+  html {
+    font-size: 25.9px; } }
+
+/**/
+body {
+  font: normal 18px/1.5 'helvetica neue','hiragino sans gb','Microsoft YaHei',arial,tahoma,sans-serif;
+  background-color: #fff; }
+
+a {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: moz-none;
+  -ms-user-select: none;
+  user-select: none; }
+
+a, button, input, textarea {
+  -webkit-tap-highlight-color: rgba(255, 0, 0, 0); }
+
+* {
+  padding: 0;
+  margin: 0; }
+
+html, body {
+  width: 100%;
+  /*height: 100%;*/
+  overflow-x: hidden;
+  background-color: #f4f4f4; }
+
+body {
+  padding-bottom: 50px;
+  font-size: 0; }
+
+.Button {
+  text-align: center;
+  display: inline-block;
+  width: 150px;
+  height: 55px;
+  background: rgba(243, 198, 35, 0.7);
+  color: #844685;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 55px;
+  border-radius: 5px;
+  margin: 10px 10px;
+  cursor: pointer; }
+  .Button:hover {
+    background: #f3c623; }
+
+.title {
+  text-align: center;
+  color: #8566aa;
+  font-size: 50px;
+  line-height: 100px;
+  margin: 10px 0; }
+
+.sub-title {
+  text-align: center;
+  color: #8566aa;
+  font-size: 20px;
+  line-height: 40px;
+  margin-bottom: 40px;
+  padding: 0 20px; }
+  .sub-title a {
+    color: rgba(243, 212, 105, 0.8); }
+    .sub-title a:hover {
+      color: #ffc600;
+      text-decoration: underline; }
+
+.left, .right {
+  display: inline-block;
+  width: 50%;
+  text-align: center;
+  vertical-align: top; }
+
+.left__title {
+  font-size: 26px;
+  color: #8566aa;
+  margin-bottom: 20px; }
+
+.left__img {
+  display: inline-block;
+  border: 2px solid #8566aa;
+  width: 60%;
+  max-width: 400px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 5px; }
+  .left__img .origin {
+    width: 100%; }
+  .left__img .result {
+    width: 100%; }
+
+.left__btns {
+  margin-top: 20px;
+  display: inline-block;
+  width: 70%; }
+
+.dialog {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  text-align: left;
+  display: none; }
+
+.dialog h3 {
+  color: #8566aa;
+  text-align: left;
+  font-size: 20px; }
+
+.dialog > .window {
+  display: inline-block;
+  position: absolute;
+  padding: 20px 50px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  background: white;
+  max-width: 400px;
+  text-align: center;
+  width: 70%;
+  border-radius: 5px; }
+
+.window > .Button {
+  width: 40%;
+  min-width: 40px; }
+
+.params {
+  text-align: left;
+  margin: 20px 0;
+  font-size: 20px;
+  line-height: 34px; }
+  .params li {
+    position: relative;
+    white-space: nowrap; }
+  .params .input {
+    position: absolute;
+    border: 2px solid #eee;
+    border-radius: 5px;
+    right: 60px;
+    width: 100px;
+    height: 70%;
+    box-sizing: border-box;
+    padding: 12px;
+    text-align: center;
+    font-size: 16px; }
+    .params .input.focus {
+      border: 2px solid #FF9999; }
+  .params .select {
+    position: absolute;
+    right: 60px;
+    border-radius: 5px;
+    padding: 5px 20px;
+    box-sizing: border-box;
+    background: white;
+    border: 2px solid #eee;
+    font-size: 16px; }
+
+.right__crop {
+  text-align: left; }
+  .right__crop__title {
+    font-size: 26px;
+    color: #8566aa;
+    margin-bottom: 20px; }
+  .right__crop__img {
+    vertical-align: middle;
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+    margin-right: 30px;
+    border: 2px solid #8566aa;
+    border-radius: 5px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("http://mtapplet.meitudata.com/596c72073971d86b5128.jpg"); }
+
+.right__filter {
+  text-align: left;
+  width: 80%; }
+  .right__filter__title {
+    font-size: 26px;
+    color: #8566aa;
+    margin-bottom: 20px;
+    margin-top: 40px; }
+  .right__filter__list {
+    white-space: nowrap;
+    overflow-x: scroll; }
+  .right__filter__btn {
+    display: inline-block;
+    font-size: 20px;
+    line-height: 40px;
+    color: #8566aa;
+    text-align: center;
+    padding: 0 20px;
+    border-radius: 5px;
+    border: 2px solid #8566aa;
+    margin-top: 10px;
+    cursor: pointer; }
+    .right__filter__btn:hover {
+      color: white;
+      background-color: #8566aa; }
+  .right__filter__img {
+    text-align: center;
+    display: inline-block;
+    width: 250px;
+    height: 360px;
+    border: 2px solid #8566aa;
+    border-radius: 5px;
+    background-size: 90% auto;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-image: url("http://mtapplet.meitudata.com/596c72073971d86b5128.jpg");
+    margin: 0 20px 0 0; }
+

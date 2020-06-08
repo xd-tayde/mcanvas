@@ -85,7 +85,6 @@ export class MImage {
             }
 
             this._queue.perform(({ cvs, quality: _quailty }) => {
-                document.body.appendChild(cvs)
                 if (exportType === 'canvas') {
                     _success(cvs)
                 } else {

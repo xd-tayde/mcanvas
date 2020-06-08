@@ -90,6 +90,13 @@ body{
     line-height: 40px;
     margin-bottom: 40px;
     padding: 0 20px;
+    a{
+        color: rgba(243, 212, 105, .8);
+        &:hover {
+            color: rgba(255, 198, 0, 1);
+            text-decoration: underline;
+        }
+    }
 }
 
 .left, .right{

@@ -43,18 +43,16 @@ export function getSize(img: TGetSizeImage): {
     iw: number,
     ih: number,
 } {
-    let iw, ih
     if (isImg(img)) {
-        iw = img.naturalWidth
-        ih = img.naturalHeight
-    } else if (isCanvas(img)) {
-        iw = img.width
-        ih = img.height
-    } else {
-        iw = img.width
-        ih = img.height
+        return {
+            iw: img.naturalWidth,
+            ih: img.naturalHeight
+        }
     }
-    return { iw, ih }
+    return {
+        iw: img.width,
+        ih: img.height
+    }
 }
 
 export function include(tar, value) {

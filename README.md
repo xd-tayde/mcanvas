@@ -11,7 +11,7 @@ New version 2.0.0 is coming. It contains some new features:
 - .draw() support usage by promise;
 - rewrite in typescript;
 
- **[Example](http://f2er.meitu.com/gxd/mcanvas/example/index.html)**
+ **[Example](http://guoxiaodong.net/)**
 
  **[Git](https://github.com/xd-tayde/mcanvas)**
 

@@ -1,6 +1,8 @@
+const ExtractCss = require('mini-css-extract-plugin')
 const webpack = require('webpack')
 const path = require('path')
 const resolve = (fileName) => path.resolve(__dirname, fileName)
+
 
 const env = process.env.ENV
 module.exports = {
@@ -42,9 +44,14 @@ module.exports = {
         }, {
             test: /\.s[ac]ss$/i,
             use: [
-              'style-loader',
-              'css-loader',
-              'sass-loader',
+                {
+                    loader: ExtractCss.loader,
+                    options: {
+                        publicPath: '../',
+                    }
+                },
+                'css-loader',
+                'sass-loader',
             ],
         }, {
             test: /\.css$/,
@@ -56,6 +63,9 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin({
             'ENV': JSON.stringify(env)
-        })
+        }),
+        new ExtractCss({
+            filename: `css/[name].css?[hash:8]`,
+        }),
     ]
 }

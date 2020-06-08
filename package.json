@@ -1,6 +1,7 @@
 {
     "name": "mcanvas",
     "description": "the image-composer or image-croper that can draw image/text/watermark or crop the image.",
+    "version": "2.0.0",
     "keywords": [
         "canvas",
         "image",
@@ -14,8 +15,9 @@
     ],
     "main": "dist/mcanvas.node.js",
     "broswer": "dist/mcanvas.web.js",
+    "module": "dist/mcanvas.web.js",
     "moduleName": "MCanvas",
-    "type": "src/lib.d.ts",
+    "types": "src/lib.d.ts",
     "scripts": {
         "dev:web": "NODE_ENV=development ENV=web webpack-dev-server --config build/webpack.example.js",
         "dev:node": "NODE_ENV=development ENV=node webpack -w --config build/webpack.example.js",
@@ -59,10 +61,11 @@
         "webpack-dev-server": "^3.10.3",
         "webpack-merge": "^4.2.2",
         "webpack-node-externals": "^1.7.2",
-        "webpack-shell-plugin": "^0.5.0"
+        "webpack-shell-plugin": "^0.5.0",
+        "node-loader": "^0.6.0",
+        "mini-css-extract-plugin": "^0.9.0"
     },
     "dependencies": {
-        "canvas": "^2.6.1",
-        "node-loader": "^0.6.0"
+        "canvas": "^2.6.1"
     }
 }
