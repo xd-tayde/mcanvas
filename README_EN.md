@@ -279,6 +279,10 @@ mi.crop(
 
 ### 2. mi.filter(type, data?)
 
+> Tips: 
+>
+> if you need use filter and crop at the same time, eg. `mi.filter('blur').crop(options).draw()`.
+
 - `blur`
 
 ```js

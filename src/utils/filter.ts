@@ -1,4 +1,4 @@
-function boxBlur(src, dst, width, height, radius) {
+export function boxBlur(src, dst, width, height, radius) {
     const tableSize = radius * 2 + 1
     const radiusPlus1 = radius + 1
     const widthMinus1 = width - 1

@@ -8,7 +8,7 @@ import {
 import { Canvas } from '../canvas'
 
 export function crop(img: HTMLCanvasElement | HTMLImageElement, options: TImage.cropOptions) {
-    const { iw, ih  } =  getSize(img)
+    const { iw, ih  } = getSize(img)
     const ops = extend(true, { 
         x: 0,
         y: 0, 

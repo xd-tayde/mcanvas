@@ -1,3 +1,7 @@
+/// <reference path="./types/commom.d.ts" />
+/// <reference path="./types/mcanvas.d.ts" />
+/// <reference path="./types/mimage.d.ts" />
+
 declare module 'mcanvas' {
     export class MCanvas {
         constructor(options?: TCanvas.options)

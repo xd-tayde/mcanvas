@@ -440,6 +440,10 @@ mi.crop(
 
 ### 2. mi.filter(type, data?)
 
+> Tips: 
+>
+> 如果需要 crop 与 filter 同时使用，建议队列先使用 filter，后使用 crop, 例如 `mi.filter('blur').crop(options).draw()`
+
 图片滤镜；
 
 - 模糊
