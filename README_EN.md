@@ -261,23 +261,7 @@ import { MImage } from 'mcanvas'
 const mi = new MImage('imageUrl')
 ```
 
-### 1. mi.crop(options)
-
-```js
-mi.crop(
-	options: {
-        x?: number | string 
-        y?: number | string
-        
-        width?: number | string
-        height?: number | string
-        
-        radius?: number | string
-    } 
-)
-```
-
-### 2. mi.filter(type, data?)
+### 1. mi.filter(type, data?)
 
 > Tips: 
 >
@@ -317,6 +301,22 @@ mi.filter('mosaic', blockSize: number = 10)
 // range: 1 ~ 5
 // levels: 1 ~ 256
 mi.filter('oil', range: number = 2, levels: number = 32)
+```
+
+### 2. mi.crop(options)
+
+```js
+mi.crop(
+	options: {
+        x?: number | string 
+        y?: number | string
+        
+        width?: number | string
+        height?: number | string
+        
+        radius?: number | string
+    } 
+)
 ```
 
 ### 3. mi.compress(options)

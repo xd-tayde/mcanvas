@@ -11,6 +11,9 @@ import './main.scss'
 //         height: 300,
 //         x: 0,
 //         y: 0,
+//     }).compress({
+//         width: 100,
+//         height: 100,
 //     }).draw()
 //     $('.js-result').attr('src', b64)
 // })()

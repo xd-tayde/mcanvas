@@ -417,28 +417,7 @@ import { MImage } from 'mcanvas'
 const mi = new MImage('imageUrl')
 ```
 
-### 1. mi.crop(options)
-
-图片裁剪；
-
-```js
-mi.crop(
-	options: {
-		 // 距离素材图左上角坐标
-        x?: number | string 
-        y?: number | string
-        
-        // 裁剪尺寸
-        width?: number | string
-        height?: number | string
-        
-        // 裁剪圆角
-        radius?: number | string
-    } 
-)
-```
-
-### 2. mi.filter(type, data?)
+### 1. mi.filter(type, data?)
 
 > Tips: 
 >
@@ -481,6 +460,27 @@ mi.filter('mosaic', blockSize: number = 10)
 // range: 1 ~ 5
 // levels: 1 ~ 256
 mi.filter('oil', range: number = 2, levels: number = 32)
+```
+
+### 2. mi.crop(options)
+
+图片裁剪；
+
+```js
+mi.crop(
+	options: {
+		 // 距离素材图左上角坐标
+        x?: number | string 
+        y?: number | string
+        
+        // 裁剪尺寸
+        width?: number | string
+        height?: number | string
+        
+        // 裁剪圆角
+        radius?: number | string
+    } 
+)
 ```
 
 ### 3. mi.compress(options)

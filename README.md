@@ -25,8 +25,8 @@ mcanvas is a image handler plugin that can easily merge, crop, compress, filter 
 
 ## Installation
 
-- You can download the latest version from the [GitHub](https://github.com/xd-tayde/mcanvas/blob/master/dist/mcanvas.min.js)
-- use a npm [CDN](https://unpkg.com/mcanvas/dist/mcanvas.min.js) and use `window.MCanvas`
+- You can download the latest version from the [GitHub](https://github.com/xd-tayde/mcanvas/blob/master/dist)
+- use a npm CDN [Web](https://unpkg.com/mcanvas/dist/mcanvas.web.js) and use `window.MCanvas`
 
 - Or you can install via npm:
 
@@ -100,6 +100,7 @@ import { MImage } from 'mcanvas'
 const mi = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
 
 mi
+    .filter('blur')
     // crop to area by 300 * 300 and center in origin image
 	.crop({
 	    x: 'center',
@@ -108,16 +109,11 @@ mi
 	    height: 300,
 	    radius: 10,
     })
-
-    // blur after crop
-    .filter('blur')
-
     // compress into a image that width is 200px and quality is 0.9
 	.compress({
         width: 200,
         quality: .9,
     })
-    
     // get the base64-image
     .draw(b64 => {
         console.log(b64)
