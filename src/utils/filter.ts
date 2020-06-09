@@ -1,86 +1,12 @@
-export function boxBlur(src, dst, width, height, radius) {
-    const tableSize = radius * 2 + 1
-    const radiusPlus1 = radius + 1
-    const widthMinus1 = width - 1
+import * as StackBlur from 'stackblur-canvas'
 
-    let r, g, b, a
-    let srcIndex = 0
-    let dstIndex
-    let p, next, prev
-    let i, l, x, y, nextIndex, prevIndex
-
-    const sumTable: number[] = []
-    for (i = 0, l = 256 * tableSize; i < l; i += 1) {
-        sumTable[i] = i / tableSize | 0
-    }
-
-    for (y = 0; y < height; y += 1) {
-        r = g = b = a = 0
-        dstIndex = y
-
-        p = srcIndex << 2
-        r += radiusPlus1 * src[p]
-        g += radiusPlus1 * src[p + 1]
-        b += radiusPlus1 * src[p + 2]
-        a += radiusPlus1 * src[p + 3]
-
-        for (i = 1; i <= radius; i += 1) {
-            p = (srcIndex + (i < width ? i : widthMinus1)) << 2
-            r += src[p]
-            g += src[p + 1]
-            b += src[p + 2]
-            a += src[p + 3]
-        }
-
-        for (x = 0; x < width; x += 1) {
-            p = dstIndex << 2
-            dst[p]     = sumTable[r]
-            dst[p + 1] = sumTable[g]
-            dst[p + 2] = sumTable[b]
-            dst[p + 3] = sumTable[a]
-
-            nextIndex = x + radiusPlus1
-            if (nextIndex > widthMinus1) {
-                nextIndex = widthMinus1
-            }
-
-            prevIndex = x - radius
-            if (prevIndex < 0) {
-                prevIndex = 0
-            }
-
-            next = (srcIndex + nextIndex) << 2
-            prev = (srcIndex + prevIndex) << 2
-
-            r += src[next]     - src[prev]
-            g += src[next + 1] - src[prev + 1]
-            b += src[next + 2] - src[prev + 2]
-            a += src[next + 3] - src[prev + 3]
-            
-            dstIndex += height
-        }
-
-        srcIndex += width
-    }
-}
-
-/**
- * Algorithm based on BoxBlurFilter.java by Huxtable.com
- * @see http://www.jhlabs.com/ip/blurring.html
- * Copyright 2005 Huxtable.com. All rights reserved.
- */
-export function blur(cvs: HTMLCanvasElement, value: number = 6) {
+export function blur(cvs: HTMLCanvasElement, value: number = 20) {
+    const { width, height } = cvs
     const ctx = cvs.getContext('2d') as CanvasRenderingContext2D
-    ctx.globalAlpha = 1 / (2 * +value)
-    for (let y = -value; y <= value; y += 2) {
-        for (let x = -value; x <= value; x += 2) {
-            ctx.drawImage(cvs, x, y)
-            if (x >= 0 && y >= 0) ctx.drawImage(cvs, -(x - 1), -(y - 1))
-        }
-    }
-    ctx.globalAlpha = 1
+    StackBlur.canvasRGBA(cvs, 0, 0, width, height, value)
     return [cvs, ctx]
 }
+
 // 翻转
 export function flip(cvs: HTMLCanvasElement, dire: 'hor' | 'ver' = 'hor') {
     const { width, height } = cvs

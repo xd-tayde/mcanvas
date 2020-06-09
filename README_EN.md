@@ -263,10 +263,6 @@ const mi = new MImage('imageUrl')
 
 ### 1. mi.filter(type, data?)
 
-> Tips: 
->
-> if you need use filter and crop at the same time, eg. `mi.filter('blur').crop(options).draw()`.
-
 - `blur`
 
 ```js

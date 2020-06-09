@@ -3,7 +3,6 @@ const webpack = require('webpack')
 const path = require('path')
 const resolve = (fileName) => path.resolve(__dirname, fileName)
 
-
 const env = process.env.ENV
 module.exports = {
     resolve: {

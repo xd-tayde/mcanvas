@@ -1,17 +1,18 @@
 {
     "name": "mcanvas",
     "description": "the image-composer or image-croper that can draw image/text/watermark or crop the image.",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "keywords": [
         "canvas",
         "image",
+        "watermark",
         "image-merge",
         "image-compose",
         "image-text",
         "image-crop",
         "image-filter",
         "image-compress",
-        "watermark"
+        "image-blur"
     ],
     "main": "dist/mcanvas.node.js",
     "broswer": "dist/mcanvas.web.js",
@@ -39,11 +40,12 @@
         "babel-polyfill": "^6.26.0",
         "clean-webpack-plugin": "^3.0.0",
         "css-loader": "^3.5.1",
-        "electron-rebuild": "^1.10.1",
         "eslint": "^7.0.0",
         "file-loader": "^6.0.0",
         "html-webpack-plugin": "^4.0.4",
         "i": "^0.3.6",
+        "mini-css-extract-plugin": "^0.9.0",
+        "node-loader": "^0.6.0",
         "node-sass": "^4.13.1",
         "nodemon": "^2.0.3",
         "npm": "^6.14.5",
@@ -61,11 +63,10 @@
         "webpack-dev-server": "^3.10.3",
         "webpack-merge": "^4.2.2",
         "webpack-node-externals": "^1.7.2",
-        "webpack-shell-plugin": "^0.5.0",
-        "node-loader": "^0.6.0",
-        "mini-css-extract-plugin": "^0.9.0"
+        "webpack-shell-plugin": "^0.5.0"
     },
     "dependencies": {
-        "canvas": "^2.6.1"
+        "canvas": "^2.6.1",
+        "stackblur-canvas": "^2.3.0"
     }
 }

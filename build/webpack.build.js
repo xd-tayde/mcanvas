@@ -1,10 +1,10 @@
 const path = require("path");
 const merge = require('webpack-merge');
+const nodeExternals = require("webpack-node-externals");
 const baseConfig = require('./webpack.base')
 const resolve = filePath => path.resolve(__dirname, filePath)
 
 const env = process.env.ENV
-
 const config = {
     mode: 'production',
     target: env,
@@ -13,10 +13,14 @@ const config = {
     ],
     output: {
         path: resolve('../dist'),
-        filename: env === 'node' ? 'mcanvas.node.js' : 'mcanvas.web.js',
+        filename: `mcanvas.${env}.js`,
         library: 'MCanvas',
         libraryTarget: 'umd'
-    }
+    },
+}
+
+if (env === 'node') {
+    config.externals = [nodeExternals()]
 }
 
 module.exports = merge(baseConfig, config)

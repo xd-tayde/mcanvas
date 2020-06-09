@@ -6,12 +6,12 @@ import './main.scss'
 
 // (async () => {
 //     const mc = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
-//     const b64 = await mc.filter('blur').crop({
+//     const b64 = await mc.crop({
 //         width: 300,
 //         height: 300,
 //         x: 0,
 //         y: 0,
-//     }).compress({
+//     }).filter('blur').compress({
 //         width: 100,
 //         height: 100,
 //     }).draw()

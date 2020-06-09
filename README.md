@@ -9,7 +9,7 @@ New version 2.0.0 is coming. It contains some new features:
     - image filter;
 - Support usage in node.js；
 - .draw() support usage by promise;
-- rewrite in typescript;
+- Rewrite in typescript;
 
  **[Example](http://guoxiaodong.net/)**
 
