@@ -99,25 +99,24 @@ import { MImage } from 'mcanvas'
 
 const mi = new MImage('http://mtapplet.meitudata.com/596c72073971d86b5128.jpg')
 
-mi
-    .filter('blur')
-    // crop to area by 300 * 300 and center in origin image
-	.crop({
-	    x: 'center',
-	    y: 'center',
-	    width: 300,
-	    height: 300,
-	    radius: 10,
-    })
-    // compress into a image that width is 200px and quality is 0.9
-	.compress({
-        width: 200,
-        quality: .9,
-    })
-    // get the base64-image
-    .draw(b64 => {
-        console.log(b64)
-    })
+mi.filter('blur')
+// crop to area by 300 * 300 and center in origin image
+.crop({
+    x: 'center',
+    y: 'center',
+    width: 300,
+    height: 300,
+    radius: 10,
+})
+// compress into a image that width is 200px and quality is 0.9
+.compress({
+    width: 200,
+    quality: .9,
+})
+// get the base64-image
+.draw(b64 => {
+    console.log(b64)
+})
 ```
 
 ## License

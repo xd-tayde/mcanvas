@@ -272,7 +272,10 @@ mc.text(
 	        type?: 'fill' | 'stroke',
 	
 	        // 当为描边时，该值控制描边宽度；
-	        lineWidth?: number,
+			lineWidth?: number,
+			
+			// 换行时是否断词，默认为 true;
+			wordBreak?: boolean,
 	
 	        // 文字阴影
 	        shadow?: {

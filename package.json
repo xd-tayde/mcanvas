@@ -1,7 +1,7 @@
 {
     "name": "mcanvas",
     "description": "the image-composer or image-croper that can draw image/text/watermark or crop the image.",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "keywords": [
         "canvas",
         "image",
@@ -24,7 +24,8 @@
         "dev:node": "NODE_ENV=development ENV=node webpack -w --config build/webpack.example.js",
         "build:web": "NODE_ENV=production ENV=web webpack -p --config build/webpack.build.js",
         "build:node": "NODE_ENV=production ENV=node webpack -p --config build/webpack.build.js",
-        "build": "rm -rf dist && npm-run-all --parallel build:node build:web"
+        "build": "rm -rf dist && npm-run-all --parallel build:node build:web",
+        "start": "npm run dev:web"
     },
     "author": "gxd(159042708@qq.com)",
     "license": "MIT",

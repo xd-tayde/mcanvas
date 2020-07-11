@@ -51,6 +51,7 @@ declare namespace TCanvas {
         lineHeight?: number,
         type?: 'fill' | 'stroke',
         lineWidth?: number,
+        wordBreak?: boolean,
         shadow?: {
             color?: string | null,
             blur?: number,

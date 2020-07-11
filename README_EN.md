@@ -150,7 +150,10 @@ mc.text(
 	        type?: 'fill' | 'stroke',
 	
 	        // the width of text's stroke;
-	        lineWidth?: number,
+			lineWidth?: number,
+			
+			// word break when changes line, default: true;
+			wordBreak?: boolean,
 	
 	        shadow?: {
 	            color?: string,

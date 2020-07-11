@@ -1,4 +1,8 @@
 ## 更新：
+- 2.0.6
+    - MCanvas.text 新增 wordBreak 属性，用于设置自动换行点；
+    - 更新文档；
+
 - 2.0.0
     - 重整项目架构，更好的模块化代码，引入 Typescript， Promise;
     - 重写 MCrop, 优化实现方式，新增 radius；

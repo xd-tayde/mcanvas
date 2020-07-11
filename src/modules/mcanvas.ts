@@ -10,6 +10,7 @@ import {
     forin,
     transValue,
     getLength,
+    splitWords,
 } from '@Src/utils'
 import { Canvas } from '@Src/canvas'
 import { crop as cropFn } from '@Src/utils/crop'
@@ -474,8 +475,9 @@ export class MCanvas {
             font: `${fontSize}px ${this._defaultFontFamily}`,
             lineHeight,
             color: '#000',
-            type : 'fill',
-            lineWidth : 1,
+            type: 'fill',
+            lineWidth: 1,
+            wordBreak: true,
             shadow: {
                 color: null,
                 blur: 0,
@@ -596,10 +598,13 @@ export class MCanvas {
             let width = this.ctx.measureText(v.text).width
 
             // 处理 <br> 换行，先替换成 '|',便于单字绘图时进行判断；
-            const context = v.text.replace(/<br>/g, '|')
+            let context: string | string[] = v.text.replace(/<br>/g, '|')
 
             // 先进行字体块超出判断，超出宽度 或 包含换行符 时采用单字绘制；
             if ((lineWidth + width) > opsWidth || include(context, '|')) {
+                // 重新分词
+                if (!style.wordBreak) context = splitWords(context)
+                
                 for (let i = 0, fontLength = context.length; i < fontLength; i++) {
                     const _context = context[i]
                     width = this.ctx.measureText(_context).width

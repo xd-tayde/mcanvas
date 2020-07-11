@@ -128,3 +128,37 @@ export function throwError(msg: string) {
 export function throwWarn(msg: string) {
     throw new Error(`[MCanvas WARN]: ${msg}`)
 }
+
+function isLetter(temp: string) {
+    const re = /^[A-Za-z]+$/g
+    if (re.test(temp)) return true 
+    return false
+}
+
+function isSymbol(temp: string) {
+    const re = /[\ |\s*(.*?)\s+$|\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\，|\。|\“|\”|\‘|\’|\¥|\？|\（|\）|\；|\：|\、|\！|\<|\.|\>|\/|\?]/g
+    if (re.test(temp)) return true 
+    return false
+}
+
+export function splitWords(context: string) {
+    if (!is.str(context)) return []
+    const result: string[] = []
+    let i, l = context.length, word = ''
+    for (i = 0; i < l; i++) {
+        const single = context[i]
+        if (isLetter(single)) {
+            // 英文， 需要进行分词
+            const next = context[i + 1]
+            word += single
+            if (isSymbol(next)) {
+                result.push(word)
+                word = ''   
+            }
+        } else {
+            // 非英文
+            result.push(single)
+        }
+    }
+    return result
+}
