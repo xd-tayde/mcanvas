@@ -381,7 +381,8 @@ mc.draw(options).then(console.log)
 mc.draw(
 	options: {
 	    // 导出图片格式
-		    // default : png;
+			// default : jpg;
+			// 当需要透明背景时，需要设置为 png；
 	    type?: 'png' | 'jpg',
 	
 	    //  图片质量，对 png 格式无效； 0~1；

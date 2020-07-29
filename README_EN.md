@@ -240,7 +240,8 @@ mc.draw(options).then(console.log)
 mc.draw(
 	options: {
         // the type of export image;
-        // default: png;
+		// default: jpg;
+			// if you want to have transparent background, you should choose png
 	    type?: 'png' | 'jpg',
 	
         //  the quality of export image : 0~1；
