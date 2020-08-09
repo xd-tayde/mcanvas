@@ -23,5 +23,5 @@ declare module 'mcanvas' {
         draw(ops?: TCommon.drawOptions | ((b64: string) => void)): Promise<string | HTMLCanvasElement>
     }
     
-    export default MCompose
+    export default MCanvas
 }
